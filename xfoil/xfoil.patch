@@ -1,0 +1,83 @@
+diff -d -Naur Xfoil/bin/Makefile XFOIL/bin/Makefile
+--- Xfoil/bin/Makefile	2013-11-18 23:23:37.000000000 -0600
++++ XFOIL/bin/Makefile	2015-03-17 22:24:39.653674902 -0500
+@@ -6,8 +6,7 @@
+ 
+ 
+ SHELL = sh
+-BINDIR = /home/codes/bin/
+-#BINDIR = .
++BINDIR = .
+ 
+ PROGS = xfoil pplot pxplot
+ 
+@@ -33,7 +32,7 @@
+ OSOBJ = frplot.o ntcalc.o osmap.o getosfile.o
+ 
+ ##----------------------------------------------------
+-PLTOBJ = ../plotlib/libPlt.a 
++PLTOBJ = ../plotlib/libPlt_gDP.a 
+ 
+ # Use this if you have a copy of the plotlib as a system library
+ #PLTOBJ = -lPlt 
+@@ -47,7 +46,7 @@
+ FC = f77
+ FFLAGS  = -O 
+ FFLOPT  = -O
+-INSTALLCMD = install -s
++INSTALLCMD = true
+ 
+ CC = cc
+ CFLAGS = -O -DUNDERSCORE
+@@ -141,19 +140,15 @@
+ 
+ xfoil: $(XFOILOBJ) $(XUTILOBJ) $(OSOBJ)
+ 	$(FC) -o xfoil $(XFOILOBJ) $(XUTILOBJ) $(OSOBJ) $(PLTOBJ) $(PLTLIB) $(FTNLIB)
+-	$(INSTALLCMD) xfoil $(BINDIR)
+ 
+ pxplot:	$(PXPLOTOBJ) $(XUTILOBJ)
+ 	$(FC) -o pxplot $(PXPLOTOBJ) $(XUTILOBJ) $(PLTOBJ) $(PLTLIB) $(FTNLIB)
+-	$(INSTALLCMD) pxplot $(BINDIR)
+ 
+ pplot:	$(PPLOTOBJ) $(XUTILOBJ)
+ 	$(FC) -o pplot $(PPLOTOBJ) $(XUTILOBJ)  $(PLTOBJ) $(PLTLIB) $(FTNLIB)
+-	$(INSTALLCMD) pplot $(BINDIR)
+ 
+ blu: blu.o profil.o
+ 	$(FC) -o blu blu.o profil.o
+-	$(INSTALLCMD) blu $(BINDIR)
+ 
+ 
+ blu.o: $(SRC)/blu.f
+diff -d -Naur Xfoil/plotlib/config.make XFOIL/plotlib/config.make
+--- Xfoil/plotlib/config.make	2013-10-06 18:32:13.000000000 -0500
++++ XFOIL/plotlib/config.make	2015-03-17 22:24:39.654674901 -0500
+@@ -7,7 +7,7 @@
+ 
+ 
+ # Set library name 
+-PLTLIB = libPlt_gSP.a
++PLTLIB = libPlt_gDP.a
+ 
+ # Some fortrans need trailing underscores in C interface symbols (see Xwin.c)
+ # This should work for most of the "unix" fortran compilers
+@@ -15,7 +15,7 @@
+ 
+ FC = gfortran
+ CC  = gcc
+-#DP = -fdefault-real-8
++DP = -fdefault-real-8
+ 
+ FFLAGS  = -m64 -O2 $(DP)
+ CFLAGS  = -m64 -O2 $(DEFINE) -I/usr/X11/include
+diff -d -Naur Xfoil/src/iopol.f XFOIL/src/iopol.f
+--- Xfoil/src/iopol.f	2012-03-09 15:22:20.000000000 -0600
++++ XFOIL/src/iopol.f	2015-03-17 22:33:24.049624832 -0500
+@@ -659,6 +659,7 @@
+ C
+ C
+       DO 40 IA = IA1, IA2
++        BACKSPACE(LU)
+         WRITE(LU,LINEF)
+      &         (CPOL(IA,IPOL(KP)), KP=1, NIPOL),
+      &        ((CPOLSD(IA,IS,JPOL(KP)), IS=1, 2*NBL), KP=1, NJPOL)

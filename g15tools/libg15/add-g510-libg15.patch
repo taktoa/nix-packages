@@ -1,0 +1,907 @@
+--- a/libg15.c	2008-11-11 13:51:26.000000000 +0000
++++ b/libg15.c	2014-02-08 00:57:28.000000000 +0000
+@@ -16,8 +16,8 @@
+     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ 
+     (c) 2006-2007 The G15tools Project - g15tools.sf.net
+-    
+-    $Revision: 292 $ -  $Date: 2008-11-11 08:51:25 -0500 (Tue, 11 Nov 2008) $ $Author: aneurysm9 $
++
++    $Revision$ -  $Date$ $Author$
+ */
+ 
+ #include <pthread.h>
+@@ -42,11 +42,8 @@
+ /* to add a new device, simply create a new DEVICE() in this list */
+ /* Fields are: "Name",VendorID,ProductID,Capabilities */
+ const libg15_devices_t g15_devices[] = {
+-    DEVICE("Logitech G15",0x46d,0xc222,G15_LCD|G15_KEYS),
+-    DEVICE("Logitech G11",0x46d,0xc225,G15_KEYS),
+-    DEVICE("Logitech Z-10",0x46d,0x0a07,G15_LCD|G15_KEYS|G15_DEVICE_IS_SHARED),
+-    DEVICE("Logitech G15 v2",0x46d,0xc227,G15_LCD|G15_KEYS|G15_DEVICE_5BYTE_RETURN),
+-    DEVICE("Logitech Gamepanel",0x46d,0xc251,G15_LCD|G15_KEYS|G15_DEVICE_IS_SHARED),
++    DEVICE("Logitech G510",0x46d,0xc22d,G15_LCD|G15_KEYS|G15_DEVICE_IS_SHARED|G15_DEVICE_G510), /* without audio activated */
++    DEVICE("Logitech G510",0x46d,0xc22e,G15_LCD|G15_KEYS|G15_DEVICE_IS_SHARED|G15_DEVICE_G510), /* with audio activated */
+     DEVICE(NULL,0,0,0)
+ };
+ 
+@@ -88,11 +85,11 @@
+     unsigned int found = 0;
+ 
+     for (i=0; g15_devices[i].name !=NULL;i++)
+-        for (bus = usb_busses; bus; bus = bus->next) 
++        for (bus = usb_busses; bus; bus = bus->next)
+     {
+         for (dev = bus->devices; dev; dev = dev->next)
+         {
+-            if ((dev->descriptor.idVendor == g15_devices[i].vendorid && dev->descriptor.idProduct == g15_devices[i].productid)) 
++            if ((dev->descriptor.idVendor == g15_devices[i].vendorid && dev->descriptor.idProduct == g15_devices[i].productid))
+                 found++;
+         }
+     }
+@@ -108,7 +105,7 @@
+      *  usb_find_busses and usb_find_devices both report the number of devices
+      *  / busses added / removed since the last call. since this is the first
+    *  call we have to return values != 0 or else we didnt find anything */
+-     
++
+     if (!usb_find_busses())
+         return G15_ERROR_OPENING_USB_DEVICE;
+ 
+@@ -117,20 +114,40 @@
+ 
+     return G15_NO_ERROR;
+ }
++/*Extra code 1*/
++int initG510() {
++    unsigned char cmd_buf_1[3] = {7, 3, 0};
++    unsigned char cmd_buf_2[19] = {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
++    int ret = 0;
+ 
++    pthread_mutex_lock(&libusb_mutex);
++    ret = usb_control_msg(keyboard_device, USB_TYPE_CLASS + USB_RECIP_INTERFACE, 9, 0x301, 1, (char*)cmd_buf_2, 19, 10000);
++
++    ret = usb_control_msg(keyboard_device, USB_TYPE_CLASS + USB_RECIP_INTERFACE, 9, 0x307, 1, (char*)cmd_buf_1, 3, 10000);
++    pthread_mutex_unlock(&libusb_mutex);
++
++/* this command is sent twice by the Logitech driver with some time distance - not 100% sure this is necessary */
++    usleep(200);
++
++    pthread_mutex_lock(&libusb_mutex);
++    ret = usb_control_msg(keyboard_device, USB_TYPE_CLASS + USB_RECIP_INTERFACE, 9, 0x307, 1, (char*)cmd_buf_1, 3, 10000);
++    pthread_mutex_unlock(&libusb_mutex);
++
++    return 0;
++}
+ static usb_dev_handle * findAndOpenDevice(libg15_devices_t handled_device, int device_index)
+ {
+     struct usb_bus *bus = 0;
+     struct usb_device *dev = 0;
+     int retries=0;
+-    int j,i,k,l;
++    int j,i,k,l,m;
+     int interface=0;
+-  
+-    for (bus = usb_busses; bus; bus = bus->next) 
++
++    for (bus = usb_busses; bus; bus = bus->next)
+     {
+         for (dev = bus->devices; dev; dev = dev->next)
+         {
+-            if ((dev->descriptor.idVendor == handled_device.vendorid && dev->descriptor.idProduct == handled_device.productid)) 
++            if ((dev->descriptor.idVendor == handled_device.vendorid && dev->descriptor.idProduct == handled_device.productid))
+             {
+                 int ret=0;
+                 char name_buffer[65535];
+@@ -164,6 +181,10 @@
+                     struct usb_config_descriptor *cfg = &dev->config[j];
+ 
+                     for (i=0;i<cfg->bNumInterfaces; i++){
++                        if (g15DeviceCapabilities()&G15_DEVICE_G510){
++                            if (i==G510_STANDARD_KEYBOARD_INTERFACE) continue;
++                        }
++
+                         struct usb_interface *ifp = &cfg->interface[i];
+                         /* if endpoints are already known, finish up */
+                         if(g15_keys_endpoint && g15_lcd_endpoint)
+@@ -176,9 +197,9 @@
+                             if(as->bInterfaceClass==USB_CLASS_HID){
+                                 g15_log(stderr, G15_LOG_INFO, "Interface %i has %i Endpoints\n", i, as->bNumEndpoints);
+                                 usleep(50*1000);
+-        			/* libusb functions ending in _np are not portable between OS's 
++        			/* libusb functions ending in _np are not portable between OS's
+                                 * Non-linux users will need some way to detach the HID driver from
+-                                * the G15 until we work out how to do this for other OS's automatically. 
++                                * the G15 until we work out how to do this for other OS's automatically.
+                                 * For the moment, we just skip this code..
+                                 */
+ #ifdef LIBUSB_HAS_GET_DRIVER_NP
+@@ -202,7 +223,7 @@
+                                     }
+ 
+                                 }
+-#endif  
++#endif
+                                 /* don't set configuration if device is shared */
+                                 if(0 == shared_device) {
+                                   ret = usb_set_configuration(devh, 1);
+@@ -235,7 +256,7 @@
+                                     if(0x80 & ep->bEndpointAddress) {
+                                         g15_keys_endpoint = ep->bEndpointAddress;
+                                     } else {
+-                                        g15_lcd_endpoint = ep->bEndpointAddress; 
++                                        g15_lcd_endpoint = ep->bEndpointAddress;
+                                     }
+ #if 0
+                                     usb_resetep(devh,ep->bEndpointAddress);
+@@ -253,29 +274,32 @@
+ 
+ 
+                 g15_log(stderr,G15_LOG_INFO,"Done opening the keyboard\n");
+-                usleep(500*1000); // sleep a bit for good measure 
++                usleep(500*1000); // sleep a bit for good measure
+                 return devh;
+             }
+-        }  
++        }
+     }
+     return 0;
+ }
+ 
+-
++/*Edited Code 1*/
+ static usb_dev_handle * findAndOpenG15() {
+     int i;
+-    for (i=0; g15_devices[i].name !=NULL  ;i++){
+-        g15_log(stderr,G15_LOG_INFO,"Trying to find %s\n",g15_devices[i].name);
+-        if(keyboard_device = findAndOpenDevice(g15_devices[i],i)){
+-            break;
+-        }
+-        else
+-            g15_log(stderr,G15_LOG_INFO,"%s not found\n",g15_devices[i].name);
++    for (i=0; g15_devices[i].name !=NULL ;i++){
++	g15_log(stderr,G15_LOG_INFO,"Trying to find %s\n",g15_devices[i].name);
++	if(keyboard_device = findAndOpenDevice(g15_devices[i],i)){
++	    if (g15DeviceCapabilities() & G15_DEVICE_G510) {
++		g15_log(stderr, G15_LOG_INFO, "Initializing G510\n");
++		initG510();
++	    }
++	    break;
++	}
++    else
++	g15_log(stderr,G15_LOG_INFO,"%s not found\n",g15_devices[i].name);
+     }
+     return keyboard_device;
+ }
+ 
+-
+ int re_initLibG15()
+ {
+ 
+@@ -285,14 +309,14 @@
+      *  usb_find_busses and usb_find_devices both report the number of devices
+      *  / busses added / removed since the last call. since this is the first
+    *  call we have to return values != 0 or else we didnt find anything */
+-     
++
+     if (!usb_find_devices())
+         return G15_ERROR_OPENING_USB_DEVICE;
+-  
++
+     keyboard_device = findAndOpenG15();
+     if (!keyboard_device)
+         return G15_ERROR_OPENING_USB_DEVICE;
+- 
++
+     return G15_NO_ERROR;
+ }
+ 
+@@ -304,18 +328,18 @@
+         return retval;
+ 
+     g15_log(stderr,G15_LOG_INFO,"%s\n",PACKAGE_STRING);
+-    
++
+ #ifdef SUN_LIBUSB
+     g15_log(stderr,G15_LOG_INFO,"Using Sun libusb.\n");
+ #endif
+ 
+     g15NumberOfConnectedDevices();
+-  
++
+     keyboard_device = findAndOpenG15();
+     if (!keyboard_device)
+         return G15_ERROR_OPENING_USB_DEVICE;
+ 
+-    pthread_mutex_init(&libusb_mutex, NULL); 
++    pthread_mutex_init(&libusb_mutex, NULL);
+     return retval;
+ }
+ 
+@@ -346,7 +370,7 @@
+ /*
+ 
+   For a set of bytes (A, B, C, etc.) the bits representing pixels will appear on the LCD like this:
+-	
++
+ 	A0 B0 C0
+ 	A1 B1 C1
+ 	A2 B2 C2
+@@ -355,7 +379,7 @@
+ 	A5 B5 C5
+ 	A6 B6 C6
+ 	A7 B7 C7
+-	
++
+ 	A0
+ 	A1  <- second 8-pixel-high row starts straight after the last byte on
+ 	A2     the previous row
+@@ -375,7 +399,7 @@
+ 	A0
+ 	A1 <- only the first three bits are shown on the bottom row (the last three
+ 	A2    pixels of the 43-pixel high display.)
+-	
++
+ 
+ */
+ 
+@@ -398,7 +422,7 @@
+         {
+             unsigned int bit = curr_col % 8;
+ 		/* Copy a 1x8 column of pixels across from the source image to the LCD buffer. */
+-		
++
+             lcd_buffer[output_offset] =
+ 			(((data[base_offset                        ] << bit) & 0x80) >> 7) |
+ 			(((data[base_offset +  G15_LCD_WIDTH/8     ] << bit) & 0x80) >> 6) |
+@@ -435,10 +459,10 @@
+             case -EAGAIN: /* try again */
+             case -EFBIG: /* too many frames to handle */
+             case -EMSGSIZE: /* msgsize is invalid */
+-                 g15_log(stderr,G15_LOG_INFO,"usb error: %s %s (%i)\n",prefix,usb_strerror(),ret);     
++                 g15_log(stderr,G15_LOG_INFO,"usb error: %s %s (%i)\n",prefix,usb_strerror(),ret);
+                  break;
+             case -EPIPE: /* endpoint is stalled */
+-                 g15_log(stderr,G15_LOG_INFO,"usb error: %s EPIPE! clearing...\n",prefix);     
++                 g15_log(stderr,G15_LOG_INFO,"usb error: %s EPIPE! clearing...\n",prefix);
+                  pthread_mutex_lock(&libusb_mutex);
+                  usb_clear_halt(keyboard_device, 0x81);
+                  pthread_mutex_unlock(&libusb_mutex);
+@@ -462,17 +486,17 @@
+ 
+     if(!(g15_devices[found_devicetype].caps & G15_LCD))
+         return 0;
+-  
++
+     /* the keyboard needs this magic byte */
+     lcd_buffer[0] = 0x03;
+   /* in an attempt to reduce peak bus utilisation, we break the transfer into 32 byte chunks and sleep a bit in between.
+-    It shouldnt make much difference, but then again, the g15 shouldnt be flooding the bus enough to cause ENOSPC, yet 
++    It shouldnt make much difference, but then again, the g15 shouldnt be flooding the bus enough to cause ENOSPC, yet
+     apparently does on some machines...
+     I'm not sure how successful this will be in combatting ENOSPC, but we'll give it try in the real-world. */
+ 
+     if(enospc_slowdown != 0){
+ #ifndef LIBUSB_BLOCKS
+-        pthread_mutex_lock(&libusb_mutex);  
++        pthread_mutex_lock(&libusb_mutex);
+ #endif
+         for(transfercount = 0;transfercount<=31;transfercount++){
+             ret = usb_interrupt_write(keyboard_device, g15_lcd_endpoint, (char*)lcd_buffer+(32*transfercount), 32, 1000);
+@@ -485,7 +509,7 @@
+         }
+ #ifndef LIBUSB_BLOCKS
+         pthread_mutex_unlock(&libusb_mutex);
+-#endif        
++#endif
+     }else{
+         /* transfer entire buffer in one hit */
+ #ifdef LIBUSB_BLOCKS
+@@ -510,21 +534,21 @@
+ {
+     int retval = 0;
+     unsigned char usb_data[] = { 2, 32, 129, 0 };
+-  
++
+     if(shared_device>0)
+         return G15_ERROR_UNSUPPORTED;
+-  
+-    switch(level) 
++
++    switch(level)
+     {
+-        case 1: 
+-            usb_data[3] = 22; 
++        case 1:
++            usb_data[3] = 22;
+             break;
+-        case 2: 
++        case 2:
+             usb_data[3] = 26;
+             break;
+         default:
+             usb_data[3] = 18;
+-    }  
++    }
+     pthread_mutex_lock(&libusb_mutex);
+     retval = usb_control_msg(keyboard_device, USB_TYPE_CLASS + USB_RECIP_INTERFACE, 9, 0x302, 0, (char*)usb_data, 4, 10000);
+     pthread_mutex_unlock(&libusb_mutex);
+@@ -535,38 +559,67 @@
+ {
+     int retval = 0;
+     unsigned char m_led_buf[4] = { 2, 4, 0, 0 };
++    unsigned char g510_led_buf[2] = {4, 0};
+     m_led_buf[2] = ~(unsigned char)leds;
+-  
++
++    if(g15DeviceCapabilities() & G15_DEVICE_G510) {
++//Set keyboard color based on M led state.
++	switch (leds & 0x07) {
++	    case 1:
++		setG510LEDColor(0, 0, 220);
++		break;
++	    case 2:
++		setG510LEDColor(220, 0, 0);
++		break;
++	    case 4:
++		setG510LEDColor(0, 220, 0);
++		break;
++	    default:
++		setG510LEDColor(0, 0, 220);
++		break;
++	}
++/* A little conversion is needed because the led bitmap for the G510 is completely different from the other keyboards.
++for g510 it is: bits 0-3 = N/A; bit 4 = MR; bit 5 = M1; bit 6 = M2; bit 7 = M3; */
++	g510_led_buf[1] |= (leds & 0x01) << 7;
++	g510_led_buf[1] |= (leds & 0x02) << 5;
++	g510_led_buf[1] |= (leds & 0x04) << 3;
++	g510_led_buf[1] |= (leds & 0x08) << 1;
++	pthread_mutex_lock(&libusb_mutex);
++	retval = usb_control_msg(keyboard_device, USB_TYPE_CLASS + USB_RECIP_INTERFACE, 9, 0x304, 1, (char*)g510_led_buf, 2, 10000);
++	pthread_mutex_unlock(&libusb_mutex);
++    }
++
+     if(shared_device>0)
+-        return G15_ERROR_UNSUPPORTED;
++	return G15_ERROR_UNSUPPORTED;
+ 
+-    pthread_mutex_lock(&libusb_mutex);
+-    retval = usb_control_msg(keyboard_device, USB_TYPE_CLASS + USB_RECIP_INTERFACE, 9, 0x302, 0, (char*)m_led_buf, 4, 10000); 
+-    pthread_mutex_unlock(&libusb_mutex);
+-    return retval;
++	pthread_mutex_lock(&libusb_mutex);
++	retval = usb_control_msg(keyboard_device, USB_TYPE_CLASS + USB_RECIP_INTERFACE, 9, 0x302, 0, (char*)m_led_buf, 4, 10000);
++	pthread_mutex_unlock(&libusb_mutex);
++
++	return retval;
+ }
+ 
+ int setLCDBrightness(unsigned int level)
+ {
+     int retval = 0;
+     unsigned char usb_data[] = { 2, 2, 0, 0 };
+-  
++
+     if(shared_device>0)
+         return G15_ERROR_UNSUPPORTED;
+-  
+-    switch(level) 
++
++    switch(level)
+     {
+-        case 1 : 
+-            usb_data[2] = 0x10; 
++        case 1 :
++            usb_data[2] = 0x10;
+             break;
+-        case 2 : 
+-            usb_data[2] = 0x20; 
++        case 2 :
++            usb_data[2] = 0x20;
+             break;
+         default:
+             usb_data[2] = 0x00;
+     }
+     pthread_mutex_lock(&libusb_mutex);
+-    retval = usb_control_msg(keyboard_device, USB_TYPE_CLASS + USB_RECIP_INTERFACE, 9, 0x302, 0, (char*)usb_data, 4, 10000); 
++    retval = usb_control_msg(keyboard_device, USB_TYPE_CLASS + USB_RECIP_INTERFACE, 9, 0x302, 0, (char*)usb_data, 4, 10000);
+     pthread_mutex_unlock(&libusb_mutex);
+     return retval;
+ }
+@@ -576,23 +629,38 @@
+ {
+     int retval = 0;
+     unsigned char usb_data[] = { 2, 1, 0, 0 };
+-  
++
+     if(shared_device>0)
+         return G15_ERROR_UNSUPPORTED;
+ 
+-    switch(level) 
++    switch(level)
+     {
+-        case 1 : 
+-            usb_data[2] = 0x1; 
++        case 1 :
++            usb_data[2] = 0x1;
+             break;
+-        case 2 : 
+-            usb_data[2] = 0x2; 
++        case 2 :
++            usb_data[2] = 0x2;
+             break;
+         default:
+             usb_data[2] = 0x0;
+     }
+     pthread_mutex_lock(&libusb_mutex);
+-    retval = usb_control_msg(keyboard_device, USB_TYPE_CLASS + USB_RECIP_INTERFACE, 9, 0x302, 0, (char*)usb_data, 4, 10000); 
++    retval = usb_control_msg(keyboard_device, USB_TYPE_CLASS + USB_RECIP_INTERFACE, 9, 0x302, 0, (char*)usb_data, 4, 10000);
++    pthread_mutex_unlock(&libusb_mutex);
++    return retval;
++}
++
++int setG510LEDColor(unsigned char r, unsigned char g, unsigned char b)
++{
++    int retval = 0;
++    unsigned char usb_data[] = { 4, 0, 0, 0 };
++
++    usb_data[1] = r;
++    usb_data[2] = g;
++    usb_data[3] = b;
++
++    pthread_mutex_lock(&libusb_mutex);
++    retval = usb_control_msg(keyboard_device, USB_TYPE_CLASS + USB_RECIP_INTERFACE, 9, 0x305, 1, (char*)usb_data, 4, 10000);
+     pthread_mutex_unlock(&libusb_mutex);
+     return retval;
+ }
+@@ -614,68 +682,68 @@
+ static void processKeyEvent9Byte(unsigned int *pressed_keys, unsigned char *buffer)
+ {
+     int i;
+-  
++
+     *pressed_keys = 0;
+-  
++
+     g15_log(stderr,G15_LOG_WARN,"Keyboard: %x, %x, %x, %x, %x, %x, %x, %x, %x\n",buffer[0],buffer[1],buffer[2],buffer[3],buffer[4],buffer[5],buffer[6],buffer[7],buffer[8]);
+-  
++
+     if (buffer[0] == 0x02)
+     {
+         if (buffer[1]&0x01)
+             *pressed_keys |= G15_KEY_G1;
+-    
++
+         if (buffer[2]&0x02)
+             *pressed_keys |= G15_KEY_G2;
+ 
+         if (buffer[3]&0x04)
+             *pressed_keys |= G15_KEY_G3;
+-    
++
+         if (buffer[4]&0x08)
+             *pressed_keys |= G15_KEY_G4;
+-    
++
+         if (buffer[5]&0x10)
+             *pressed_keys |= G15_KEY_G5;
+ 
+         if (buffer[6]&0x20)
+             *pressed_keys |= G15_KEY_G6;
+ 
+-    
++
+         if (buffer[2]&0x01)
+             *pressed_keys |= G15_KEY_G7;
+-    
++
+         if (buffer[3]&0x02)
+             *pressed_keys |= G15_KEY_G8;
+-    
++
+         if (buffer[4]&0x04)
+             *pressed_keys |= G15_KEY_G9;
+-    
++
+         if (buffer[5]&0x08)
+             *pressed_keys |= G15_KEY_G10;
+-    
++
+         if (buffer[6]&0x10)
+             *pressed_keys |= G15_KEY_G11;
+-    
++
+         if (buffer[7]&0x20)
+             *pressed_keys |= G15_KEY_G12;
+-    
++
+         if (buffer[1]&0x04)
+             *pressed_keys |= G15_KEY_G13;
+-    
++
+         if (buffer[2]&0x08)
+             *pressed_keys |= G15_KEY_G14;
+-    
++
+         if (buffer[3]&0x10)
+             *pressed_keys |= G15_KEY_G15;
+-    
++
+         if (buffer[4]&0x20)
+             *pressed_keys |= G15_KEY_G16;
+-    
++
+         if (buffer[5]&0x40)
+             *pressed_keys |= G15_KEY_G17;
+-    
++
+         if (buffer[8]&0x40)
+             *pressed_keys |= G15_KEY_G18;
+-    
++
+         if (buffer[6]&0x01)
+             *pressed_keys |= G15_KEY_M1;
+         if (buffer[7]&0x02)
+@@ -705,16 +773,18 @@
+ static void processKeyEvent5Byte(unsigned int *pressed_keys, unsigned char *buffer)
+ {
+     int i;
+-  
++
+     *pressed_keys = 0;
+-  
++
+     g15_log(stderr,G15_LOG_WARN,"Keyboard: %x, %x, %x, %x, %x\n",buffer[0],buffer[1],buffer[2],buffer[3],buffer[4]);
+-  
+-    if (buffer[0] == 0x02)
++
++    
++    // G510
++    if (buffer[0] == 0x03)
+     {
+         if (buffer[1]&0x01)
+             *pressed_keys |= G15_KEY_G1;
+-    
++
+         if (buffer[1]&0x02)
+             *pressed_keys |= G15_KEY_G2;
+ 
+@@ -729,44 +799,214 @@
+ 
+         if (buffer[1]&0x20)
+             *pressed_keys |= G15_KEY_G6;
+-            
++
+         if (buffer[1]&0x40)
+-            *pressed_keys |= G15_KEY_M1;
+-            
++            *pressed_keys |= G15_KEY_G7;
++
+         if (buffer[1]&0x80)
+-            *pressed_keys |= G15_KEY_M2;
+-            
++            *pressed_keys |= G15_KEY_G8;
++
++        if (buffer[2]&0x01)
++            *pressed_keys |= G15_KEY_G9;
++
++        if (buffer[2]&0x02)
++            *pressed_keys |= G15_KEY_G10;
++
++        if (buffer[2]&0x04)
++            *pressed_keys |= G15_KEY_G11;
++
++        if (buffer[2]&0x08)
++            *pressed_keys |= G15_KEY_G12;
++
++        if (buffer[2]&0x10)
++            *pressed_keys |= G15_KEY_G13;
++
+         if (buffer[2]&0x20)
+-            *pressed_keys |= G15_KEY_M3;
+-            
++            *pressed_keys |= G15_KEY_G14;
++
+         if (buffer[2]&0x40)
+-            *pressed_keys |= G15_KEY_MR;
++            *pressed_keys |= G15_KEY_G15;
+ 
+         if (buffer[2]&0x80)
++            *pressed_keys |= G15_KEY_G16;
++
++        if (buffer[3]&0x01)
++            *pressed_keys |= G15_KEY_G17;
++
++        if (buffer[3]&0x02)
++            *pressed_keys |= G15_KEY_G18;
++
++        if (buffer[3]&0x10)
++            *pressed_keys |= G15_KEY_M1;
++
++        if (buffer[3]&0x20)
++            *pressed_keys |= G15_KEY_M2;
++
++        if (buffer[3]&0x40)
++            *pressed_keys |= G15_KEY_M3;
++
++        if (buffer[3]&0x80)
++            *pressed_keys |= G15_KEY_MR;
++
++        if (buffer[4]&0x1)
+             *pressed_keys |= G15_KEY_L1;
+-            
+-        if (buffer[2]&0x2)
++
++        if (buffer[4]&0x2)
+             *pressed_keys |= G15_KEY_L2;
+-            
+-        if (buffer[2]&0x4)
++
++        if (buffer[4]&0x4)
+             *pressed_keys |= G15_KEY_L3;
+ 
+-        if (buffer[2]&0x8)
++        if (buffer[4]&0x8)
+             *pressed_keys |= G15_KEY_L4;
+-            
+-        if (buffer[2]&0x10)
++
++        if (buffer[4]&0x10)
+             *pressed_keys |= G15_KEY_L5;
+-            
+-        if (buffer[2]&0x1)
++
++        if (buffer[3]&0x8)
+             *pressed_keys |= G15_KEY_LIGHT;
+     }
+ }
+ 
++static void processKeyEvent4Byte(unsigned int *pressed_keys, unsigned char *buffer)
++{
++	int i;
++
++	*pressed_keys = 0;
++
++	g15_log(stderr,G15_LOG_WARN,"Keyboard: %x, %x, %x, %x\n",buffer[0],buffer[1],buffer[2],buffer[3]);
++
++	if (buffer[0] == 0x02)
++	{
++		if (buffer[1]&0x01)
++			*pressed_keys |= G15_KEY_G1;
++
++		if (buffer[1]&0x02)
++			*pressed_keys |= G15_KEY_G2;
++
++		if (buffer[1]&0x04)
++			*pressed_keys |= G15_KEY_G3;
++
++		if (buffer[1]&0x08)
++			*pressed_keys |= G15_KEY_G4;
++
++		if (buffer[1]&0x10)
++			*pressed_keys |= G15_KEY_G5;
++
++		if (buffer[1]&0x20)
++			*pressed_keys |= G15_KEY_G6;
++
++		if (buffer[1]&0x40)
++			*pressed_keys |= G15_KEY_G7;
++
++		if (buffer[1]&0x80)
++			*pressed_keys |= G15_KEY_G8;
++
++		if (buffer[2]&0x01)
++			*pressed_keys |= G15_KEY_G9;
++
++		if (buffer[2]&0x02)
++			*pressed_keys |= G15_KEY_G10;
++
++		if (buffer[2]&0x04)
++			*pressed_keys |= G15_KEY_G11;
++
++		if (buffer[2]&0x08)
++			*pressed_keys |= G15_KEY_G12;
++
++		if (buffer[2]&0x10)
++			*pressed_keys |= G15_KEY_M1;
++
++		if (buffer[2]&0x20)
++			*pressed_keys |= G15_KEY_M2;
++
++		if (buffer[2]&0x40)
++			*pressed_keys |= G15_KEY_M3;
++
++		if (buffer[2]&0x80)
++			*pressed_keys |= G15_KEY_MR;
++
++		if (buffer[3]&0x1)
++			*pressed_keys |= G15_KEY_LIGHT;
++	}
++}
++
++// Logitech G510 Media Keys implementation. Unknown if this will work for other
++// models. Using the backlight key as a modifier. The assumption is you would
++// normally not be holding down the backlight key while pressing G-keys.
++static void processKeyEvent2Byte(unsigned int *pressed_keys, unsigned char *buffer)
++{
++    // Key modifier
++    *pressed_keys |= G15_KEY_LIGHT;
++
++    // XF86AudioPlay 175
++    if (*pressed_keys & G15_KEY_G1)
++	     *pressed_keys -= G15_KEY_G1;
++
++    // XF86AudioStop 176
++    if (*pressed_keys & G15_KEY_G2)
++	     *pressed_keys -= G15_KEY_G2;
++    // XF86AudioPrev 177
++    else if (*pressed_keys & G15_KEY_G3)
++	     *pressed_keys -= G15_KEY_G3;
++    // XF86AudioMute 179
++    else if (*pressed_keys & G15_KEY_G5)
++	     *pressed_keys -= G15_KEY_G5;
++    // XF86AudioRaiseVolume 180
++    else if (*pressed_keys & G15_KEY_G6){
++	     *pressed_keys -= G15_KEY_G6;
++	     if (*pressed_keys & G15_KEY_G7){
++	     }
++    }
++    // XF86AudioLowerVolume 181
++    else if (*pressed_keys & G15_KEY_G7)
++	     *pressed_keys -= G15_KEY_G7;
++
++
++    // XF86AudioNext 178
++    if (*pressed_keys & G15_KEY_G4)
++	     *pressed_keys -= G15_KEY_G4;
++
++    g15_log(stderr,G15_LOG_WARN,"Keyboard: %x, %x\n", buffer[0], buffer[1]);
++
++    if (buffer[0] == 0x02)
++    {
++        // XF86AudioPlay
++        if (buffer[1] & 0x08)
++            *pressed_keys |= G15_KEY_G1;
++
++        // XF86AudioStop
++        if (buffer[1] & 0x04)
++            *pressed_keys |= G15_KEY_G2;
++        // XF86AudioPrev
++        else if (buffer[1] & 0x02)
++            *pressed_keys |= G15_KEY_G3;
++        // XF86AudioMute
++        else if (buffer[1] & 0x16)
++            *pressed_keys |= G15_KEY_G5;
++        // XF86AudioRaiseVolume
++        else if (buffer[1] & 0x32){
++            *pressed_keys |= G15_KEY_G6;
++	    if (buffer[1] & 0x64){
++		}
++	}
++        // XF86AudioLowerVolume
++        else if (buffer[1] & 0x64)
++            *pressed_keys |= G15_KEY_G7;
++
++        // XF86AudioNext
++        if (buffer[1] & 0x01)
++            *pressed_keys |= G15_KEY_G4;
++;
++    }
++}
+ 
+ int getPressedKeys(unsigned int *pressed_keys, unsigned int timeout)
+ {
+     unsigned char buffer[G15_KEY_READ_LENGTH];
+     int ret = 0;
++    int caps = 0;
++
+ #ifdef LIBUSB_BLOCKS
+     ret = usb_interrupt_read(keyboard_device, g15_keys_endpoint, (char*)buffer, G15_KEY_READ_LENGTH, timeout);
+ #else
+@@ -776,16 +1016,28 @@
+ #endif
+     if(ret>0) {
+       if(buffer[0] == 1)
+-        return G15_ERROR_TRY_AGAIN;    
++        return G15_ERROR_TRY_AGAIN;
+     }
+ 
++    caps = g15DeviceCapabilities();
++
+     switch(ret) {
++      case 4:
++          processKeyEvent4Byte(pressed_keys, buffer);
++          return G15_NO_ERROR;
+       case 5:
+           processKeyEvent5Byte(pressed_keys, buffer);
+           return G15_NO_ERROR;
+       case 9:
+           processKeyEvent9Byte(pressed_keys, buffer);
+           return G15_NO_ERROR;
++      case 2:
++          if (g15DeviceCapabilities() & G15_DEVICE_G510)
++			 {
++              processKeyEvent2Byte(pressed_keys, buffer);
++              return G15_NO_ERROR;
++		    }
++			 // Deliberate fallthrough
+       default:
+           return handle_usb_errors("Keyboard Read", ret); /* allow the app to deal with errors */
+     }
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+--- a/libg15.h	2008-11-11 13:51:26.000000000 +0000
++++ b/libg15.h	2013-04-09 19:42:50.000000000 +0000
+@@ -17,7 +17,7 @@
+     
+     (c) 2006 - 2007 The G15tools Project - g15tools.sf.net
+     
+-    $Revision: 292 $ -  $Date: 2008-11-11 08:51:25 -0500 (Tue, 11 Nov 2008) $ $Author: aneurysm9 $
++    $Revision$ -  $Date$ $Author$
+ */
+ 
+ #ifndef _LIBG15_H_
+@@ -32,8 +32,10 @@
+ #define G15_KEYS 2
+ #define G15_DEVICE_IS_SHARED 4
+ #define G15_DEVICE_5BYTE_RETURN 8
++#define G15_DEVICE_G510 16
+ 
+ #define G15_KEY_READ_LENGTH 9
++#define G510_STANDARD_KEYBOARD_INTERFACE	0x0
+ 
+ typedef struct libg15_devices_t libg15_devices_t;
+ 
+@@ -126,22 +128,31 @@
+     G15_KEY_G16 = 1<<15,
+     G15_KEY_G17 = 1<<16,
+     G15_KEY_G18 = 1<<17,
+-    
++    G15_KEY_G19 = 1<<28,
++    G15_KEY_G20 = 1<<29,
++    G15_KEY_G21 = 1<<30,
++    G15_KEY_G22 = 1<<31,
++
+     G15_KEY_M1  = 1<<18,
+     G15_KEY_M2  = 1<<19,
+     G15_KEY_M3  = 1<<20,
+     G15_KEY_MR  = 1<<21,
+-    
++
+     G15_KEY_L1  = 1<<22,
+     G15_KEY_L2  = 1<<23,
+     G15_KEY_L3  = 1<<24,
+     G15_KEY_L4  = 1<<25,
+     G15_KEY_L5  = 1<<26,
+-    
++
+     G15_KEY_LIGHT = 1<<27
++
++    //need to add them to the enum but not enough positions left
++    //  G15_KEY_JOYBL = 1<<32,
++    //  G15_KEY_JOYBD = 1<<33,
++    //  G15_KEY_JOYBS = 1<<34
+   };
+ 
+-  
++
+   /* this one return G15_NO_ERROR on success, something
+    * else otherwise (for instance G15_ERROR_OPENING_USB_DEVICE */
+   int initLibG15();
+@@ -157,6 +168,7 @@
+   int setLEDs(unsigned int leds);
+   int setLCDBrightness(unsigned int level);
+   int setKBBrightness(unsigned int level);  
++  int setG510LEDColor(unsigned char r, unsigned char g, unsigned char b);  
+ 
+   /* Please be warned
+    * the g15 sends two different usb msgs for each key press

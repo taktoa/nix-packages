@@ -1,0 +1,24 @@
+diff -ur a/corba/gnome/corba/guile-gnome-corba-generic.c b/corba/gnome/corba/guile-gnome-corba-generic.c
+--- a/corba/gnome/corba/guile-gnome-corba-generic.c	2015-07-22 11:42:52.531408018 -0500
++++ b/corba/gnome/corba/guile-gnome-corba-generic.c	2015-07-22 11:43:29.146521759 -0500
+@@ -24,7 +24,7 @@
+ 
+ #include <guile-gnome-corba-generic.h>
+ #include <guile-gnome-gobject.h>
+-#include <glib/gstrfuncs.h>
++#include <glib.h>
+ #include <string.h>
+ 
+ static GQuark quark_corba_typecode = 0;
+diff -ur a/glib/gnome/gobject/guile-support.h b/glib/gnome/gobject/guile-support.h
+--- a/glib/gnome/gobject/guile-support.h	2015-07-22 11:42:52.534408027 -0500
++++ b/glib/gnome/gobject/guile-support.h	2015-07-22 11:43:52.736595201 -0500
+@@ -24,7 +24,7 @@
+ #ifndef __GUILE_SUPPORT_H__
+ #define __GUILE_SUPPORT_H__
+ 
+-#include <glib/gmacros.h>
++#include <glib.h>
+ 
+ #include <libguile.h>
+ 

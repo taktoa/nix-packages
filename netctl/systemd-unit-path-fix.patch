@@ -1,0 +1,26 @@
+diff -daur a/Makefile b/Makefile
+--- a/Makefile	2015-11-16 19:18:26.287136966 -0600
++++ b/Makefile	2015-11-16 19:23:07.008111448 -0600
+@@ -2,9 +2,8 @@
+ 
+ PKG_CONFIG ?= pkg-config
+ 
+-sd_var = $(shell $(PKG_CONFIG) --variable=systemd$(1) systemd)
+-systemdsystemconfdir = $(call sd_var,systemconfdir)
+-systemdsystemunitdir = $(call sd_var,systemunitdir)
++systemdsystemconfdir = /etc/systemd/system
++systemdsystemunitdir = /lib/systemd/system
+ 
+ .PHONY: install tarball pkgbuild clean
+ 
+@@ -22,8 +21,8 @@
+ 	install -m755 src/lib/{auto.action,network} $(DESTDIR)/usr/lib/network/
+ 	# Scripts
+ 	install -d $(DESTDIR)/usr/bin
+-	sed -e "s|@systemdsystemconfdir@|$(systemdsystemconfdir)|g" \
+-	    -e "s|@systemdsystemunitdir@|$(systemdsystemunitdir)|g" \
++	sed -e "s|@systemdsystemconfdir@|$(DESTDIR)$(systemdsystemconfdir)|g" \
++	    -e "s|@systemdsystemunitdir@|$(DESTDIR)$(systemdsystemunitdir)|g" \
+ 	    src/netctl.in > $(DESTDIR)/usr/bin/netctl
+ 	chmod 755 $(DESTDIR)/usr/bin/netctl
+ 	install -m755 \
