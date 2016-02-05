@@ -1,11 +1,15 @@
 { stdenv, fetchFromGitHub
 , makeWrapper
-, cinnamon, xclip, scrot
+, gnome, xclip, scrot
 , xdg_utils, gnused, curl
 }:
 
-let zenity = cinnamon.zenity;
-    xdg    = xdg_utils;
+with builtins;
+
+let zenity   = gnome.zenity;
+    xdg      = xdg_utils;
+    joinMap  = show: sep: xs: concatStringsSep sep (map show xs);
+    makePath = joinMap (p: "${p}/bin") ":";
 in stdenv.mkDerivation rec {
   name = "zscreen-ng-20150830";
 
@@ -23,28 +27,14 @@ in stdenv.mkDerivation rec {
   };
 
   dontBuild = true;
-  
+
+  PATH_ADD = makePath [ zenity scrot xdg xclip ];
+    
   installPhase = ''
     install -Dm755 src/zimgur.sh  "$out/bin/zimgur"
     install -Dm755 src/zscreen.sh "$out/bin/zscreen"
-    export ADD="${cinnamon.zenity}/bin:${scrot}/bin:${xdg_utils}/bin:${xclip}/bin"
-    wrapProgram $out/bin/zimgur  --suffix PATH : "$ADD"
-    wrapProgram $out/bin/zscreen --suffix PATH : "$ADD"
-
-    # mkdir -p $out $out/share/doc/ $out/bin
-    # cp conf.sh.example $out/share/doc/w
-    # substitute src/zscreen.sh $out/bin/zscreen      \
-    #     --replace "curl"     "${curl}/bin/curl"     \
-    #     --replace "scrot"    "${scrot}/bin/scrot"   \
-    #     --replace "xclip"    "${xclip}/bin/xclip"   \
-    #     --replace "xdg-open" "${xdg}/bin/xdg-open"  \
-    #     --replace "zenity"   "${zenity}/bin/zenity"
-    # substitute src/zimgur.sh $out/bin/zimgur        \
-    #     --replace "curl"     "${curl}/bin/curl"     \
-    #     --replace "scrot"    "${scrot}/bin/scrot"   \
-    #     --replace "xclip"    "${xclip}/bin/xclip"   \
-    #     --replace "xdg-open" "${xdg}/bin/xdg-open"  \
-    #     --replace "zenity"   "${zenity}/bin/zenity"
+    wrapProgram $out/bin/zimgur  --suffix PATH : "$PATH_ADD"
+    wrapProgram $out/bin/zscreen --suffix PATH : "$PATH_ADD"
   '';
   
   meta = {

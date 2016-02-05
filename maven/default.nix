@@ -20,7 +20,7 @@ stdenv.mkDerivation rec {
 
   mavenColorConf = ./log4j2.xml;
 
-  dontBuild = true;  
+  dontBuild = true;
 
   installPhase = ''
       mkdir -p $out
