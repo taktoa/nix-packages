@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Timer</title>
+  </head>
+  <body>
+    <div id="frame">
+      <object id="timer"
+              type="application/x-shockwave-flash"
+              data="@TIMER_SWF@"
+              align="middle"
+              width="800" height="600" />
+    </div>
+    <script type="application/javascript">
+      var timer = document.getElementById("timer");
+      var frame = document.getElementById("frame");
+
+      function fullScreenCB() {
+        var w = window.innerWidth  + 'px';
+        var h = window.innerHeight + 'px';
+        timer.style.height = h;
+        frame.style.height = h;
+	    frame.style.width  = w;
+        return false;
+      }
+
+      function fullScreenSetup() {
+        timer.style.width   = "100%";
+        timer.style.display = "block";
+        timer.style.clear   = "both";
+        fullScreenCB();
+        return false;	
+      }
+
+      window.onload   = fullScreenSetup;
+      window.onresize = fullScreenCB;
+    </script>
+  </body>
+</html>
