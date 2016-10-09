@@ -62,19 +62,43 @@ let removeNulls = lib.filterAttrs (n: v: v != null);
 in pythonPackages // (rec {
   # bobbuilder = pkgs.callPackage ./bobbuilder {};
 
-  theano-deep = pythonPackages.mkPython (rec {
-    packageName  = "theano-deep";
-    version      = "0.8.2";
-    srcURL       = pypiURL "theano" version;
-    srcSHA       = "0hllf58wyz7mi7582psvswxgrybxidsv2vk3xgyarisxcxfc6w9r";
-    propDeps     = with self; [ logilab_common six ];
-    homepage     = http://deeplearning.net/software/theano/;
-    description  = "Optimizing compiler for evaluating mathematical expressions on CPUs and GPUs.";
-    license      = lib.licenses.bsd;
-    maintainers  = with lib.maintainers; [ andrew ];
+  gst-gtklaunch = mkPython (rec {
+    packageName = "gst-gtklaunch";
+    version = "20160115";
+    
+    src = pkgs.fetchFromGitHub {
+      owner  = "UbiCastTeam";
+      repo   = "gst-gtklaunch-1.0";
+      rev    = "f53b1eb2a5ee089eef641d885103308411712f0e";
+      sha256 = "1ik4n20splppq0zjgi3ixmab7vq9yy7m6cih08jw5bf334lnznvd";
+    };
+                   
+    propDeps = with pkgs; [
+      gtk3
+      pygobject3
+      graphviz
+      gobjectIntrospection
+      gst_all_1.gstreamer
+      gst_all_1.gst-plugins-base
+      gst_all_1.gst-plugins-good
+      gst_all_1.gst-plugins-ugly
+      gst_all_1.gst-plugins-bad
+    ];
+
+    makeWrapperArgs = [
+      "--prefix GI_TYPELIB_PATH : \"$GI_TYPELIB_PATH\""
+      "--prefix GST_PLUGIN_SYSTEM_PATH_1_0 : \"$GST_PLUGIN_SYSTEM_PATH_1_0\""
+      "--prefix PATH : \"${pkgs.graphviz}/bin\""
+      "--prefix PATH : \"${pkgs.python27Packages.xdot}/bin\""
+    ];
+                   
+    homepage     = "https://github.com/UbiCastTeam/gst-gtklaunch-1.0";
+    description  = "A utility for testing GStreamer pipelines and elements";
+    license      = with lib.licenses; [ lgpl21.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
     platforms    = with lib.platforms; all;
   });
-    
+  
   typed-ast = mkPython (rec {
     packageName  = "typed-ast";
     version      = "0.5.3";
@@ -148,7 +172,7 @@ in pythonPackages // (rec {
     version      = "1.3";
     srcURL       = pypiURL packageName version;
     srcSHA       = "0z03bai6a9gfl6hy8cracb88i51ghczn8xdxsxj7ayc7kjskm2id";
-    propDeps     = with pkgs; [ ];
+    propDeps     = with pkgs; [];
     homepage     = "https://nadh.in/code/xmlutils.py";
     description  = "Tools for converting XML to JSON, CSV, and other formats.";
     license      = with lib.licenses; [ mit.spdxId ];

@@ -1,0 +1,15 @@
+diff --git a/src/Mixfix/variableGenerator.hh b/src/Mixfix/variableGenerator.hh
+index 0aabf14..30ad5d7 100755
+--- a/src/Mixfix/variableGenerator.hh
++++ b/src/Mixfix/variableGenerator.hh
+@@ -30,8 +30,8 @@
+ #include "SMT_EngineWrapper.hh"
+ 
+ #ifdef USE_CVC4
+-#include "cvc4/expr/expr_manager.h"
+-#include "cvc4/smt/smt_engine.h"
++#include <cvc4/expr/expr_manager.h>
++#include <cvc4/smt/smt_engine.h>
+ 
+ using namespace CVC4;
+ #endif
