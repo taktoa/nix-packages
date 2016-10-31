@@ -1,0 +1,62 @@
+diff --git a/gulpfile.coffee b/gulpfile.coffee
+index a8507ab..63934cc 100644
+--- a/gulpfile.coffee
++++ b/gulpfile.coffee
+@@ -9,7 +9,6 @@ sourcemaps = require 'gulp-sourcemaps'
+ install    = require 'gulp-install'
+ {execSync} = require 'child_process'
+ concat     = require 'gulp-concat'
+-autoReload = require 'gulp-auto-reload'
+ changed    = require 'gulp-changed'
+ rename     = require 'gulp-rename'
+ 
+@@ -111,28 +110,12 @@ gulp.task 'fontello', ->
+     gulp.src [paths.css, paths.fonts...]
+         .pipe gulp.dest outapp
+ 
+-
+-gulp.task 'reloader', ->
+-    # create an auto reload server instance
+-    reloader = autoReload()
+-
+-    # copy the client side script
+-    reloader.script()
+-        .pipe gulp.dest outui
+-
+-    # inject scripts in html
+-    htmlInject = reloader.inject
+-
+-    # watch rebuilt stuff
+-    gulp.watch "#{outui}/**/*", reloader.onChange
+-
+-
+ gulp.task 'clean', (cb) ->
+     rimraf outapp, cb
+ 
+ gulp.task 'default', ['package', 'coffee', 'html', 'images', 'icons', 'less', 'fontello']
+ 
+-gulp.task 'watch', ['default', 'reloader', 'html'], ->
++gulp.task 'watch', ['default', 'html'], ->
+     # watch to rebuild
+     sources = (v for k, v of paths)
+     gulp.watch sources, ['default']
+diff --git a/package.json b/package.json
+index d83ebb6..6bfcbc6 100644
+--- a/package.json
++++ b/package.json
+@@ -46,7 +46,6 @@
+     "coffee-script": "^1.9.2",
+     "electron-prebuilt": "^1.2.1",
+     "gulp": "^3.8.11",
+-    "gulp-auto-reload": "0.1.0",
+     "gulp-changed": "^1.2.1",
+     "gulp-coffee": "^2.3.1",
+     "gulp-concat": "^2.6.0",
+@@ -55,6 +54,7 @@
+     "gulp-rename": "^1.2.2",
+     "gulp-sourcemaps": "^1.5.2",
+     "gulp-util": "^3.0.6",
++    "less": "^2.7.1",
+     "mocha": "^2.2.5",
+     "rimraf": "^2.4.2",
+     "sinon": "^1.15.4",

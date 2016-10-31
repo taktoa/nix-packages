@@ -2,7 +2,7 @@ NPM2NIX = npm2nix
 
 .PHONY: update
 
-update: node.nix
+update: node-packages.nix
 
-node.nix: pkgs.json
-	$(NPM2NIX) pkgs.json node.nix
+node-packages.nix: pkgs.json
+	$(NPM2NIX) pkgs.json node-packages.nix

@@ -1,5 +1,6 @@
-let secret = import ./include/secret.nix;
-in {
+{ secret }:
+
+{
 
 # ------------------------------------------------------------------------------
 # --------------------------- General configuration ----------------------------
@@ -10,16 +11,16 @@ in {
     enableLibraryProfiling = true;
   };
 
-  chromium = {
-    enableSELinux       = true;
-    enableNaCl          = true;
-    enablePepperFlash   = true;
-    enableWideVine      = true;
-    gnomeSupport        = true;
-    gnomeKeyringSupport = true;
-    pulseSupport        = true;
-    hiDPISupport        = true;
-  };
+  # chromium = {
+  #   enableSELinux       = true;
+  #   enableNaCl          = true;
+  #   enablePepperFlash   = true;
+  #   enableWideVine      = true;
+  #   gnomeSupport        = true;
+  #   gnomeKeyringSupport = true;
+  #   pulseSupport        = true;
+  #   hiDPISupport        = true;
+  # };
 
   #openblas.preferLocalBuild = true;
 
@@ -38,71 +39,72 @@ in {
 # ----------------------------| Personal packages |-----------------------------
 #                             *-------------------*
 
+    nixpkgs-manual = import <nixpkgs/doc>;
 
-    bussard = pkgs.callPackage ./packages/bussard {};
+    bussard = pkgs.callPackage ./bussard {};
 
-    bustle = pkgs.callPackage ./packages/bustle {};
+    bustle = pkgs.callPackage ./bustle {};
 
     getVersion = k: (builtins.parseDrvName k.name).version;
 
-    utility = pkgs.callPackage ./packages/utility {};
+    utility = pkgs.callPackage ./utility {};
 
-    smackage = pkgs.callPackage ./packages/smackage {};
+    smackage = pkgs.callPackage ./smackage {};
 
-    antlr4 = pkgs.callPackage ./packages/antlr4 {};
+    antlr4 = pkgs.callPackage ./antlr4 {};
 
-    h2o = pkgs.callPackage ./packages/h2o {};
+    h2o = pkgs.callPackage ./h2o {};
 
-    rapidjson = pkgs.callPackage ./packages/rapidjson {};
+    rapidjson = pkgs.callPackage ./rapidjson {};
 
-    googletest = pkgs.callPackage ./packages/googletest {};
+    googletest = pkgs.callPackage ./googletest {};
 
-    lm-math = pkgs.callPackage ./packages/lm-math {};
+    lm-math = pkgs.callPackage ./lm-math {};
 
-    pragmataPro = pkgs.callPackage ./packages/nonfree/pragmata-pro {};
+    pragmataPro = pkgs.callPackage ./nonfree/pragmata-pro {};
 
-    enigma = pkgs.callPackage ./packages/enigma {};
+    enigma = pkgs.callPackage ./enigma {};
 
-    technicLauncher = pkgs.callPackage ./packages/technic-launcher {};
+    technicLauncher = pkgs.callPackage ./technic-launcher {};
 
-    pmd = pkgs.callPackage ./packages/pmd {};
+    pmd = pkgs.callPackage ./pmd {};
 
-    libg15 = pkgs.callPackage ./packages/g15tools/libg15 {};
+    libg15 = pkgs.callPackage ./g15tools/libg15 {};
 
-    libg15render = pkgs.callPackage ./packages/g15tools/libg15render {};
+    libg15render = pkgs.callPackage ./g15tools/libg15render {};
 
-    g15composer = pkgs.callPackage ./packages/g15tools/g15composer {};
+    g15composer = pkgs.callPackage ./g15tools/g15composer {};
 
-    g15daemon = pkgs.callPackage ./packages/g15tools/g15daemon {};
+    g15daemon = pkgs.callPackage ./g15tools/g15daemon {};
 
-    g15macro = pkgs.callPackage ./packages/g15tools/g15macro {};
+    g15macro = pkgs.callPackage ./g15tools/g15macro {};
 
     g15tools = pkgs.buildEnv {
       name = "g15tools";
       paths = with pkgs; [ libg15 libg15render g15composer g15daemon g15macro ];
     };
 
-    fbset = pkgs.callPackage ./packages/fbset {};
+    fbset = pkgs.callPackage ./fbset {};
 
-    languagetool = pkgs.callPackage ./packages/languagetool {};
+    languagetool = pkgs.callPackage ./languagetool {};
 
-    #  guilePackages = pkgs.callPackage ./packages/guilePackages {};
+    #  guilePackages = pkgs.callPackage ./guilePackages {};
 
-    gtick = pkgs.callPackage ./packages/gtick {};
+    gtick = pkgs.callPackage ./gtick {};
 
-    ariamaestosa = pkgs.callPackage ./packages/ariamaestosa {};
+    ariamaestosa = pkgs.callPackage ./ariamaestosa {};
 
-    #obs-studio = pkgs.callPackage ./packages/obs-studio {};
+    #obs-studio = pkgs.callPackage ./obs-studio {};
 
-    mocp-xmobar = pkgs.callPackage ./packages/mocp-xmobar {};
+    mocp-xmobar = pkgs.callPackage ./mocp-xmobar {};
 
-    powerline-fonts = pkgs.callPackage ./packages/powerline-fonts {};
+    powerline-fonts = pkgs.callPackage ./powerline-fonts {};
 
-    # maven = pkgs.callPackage ./packages/maven {}
+    # maven = pkgs.callPackage ./maven {}
 
-    rust-bindgen = pkgs.callPackage ./packages/rust-bindgen {};
+    rust-bindgen = pkgs.callPackage ./rust-bindgen {};
 
-    matlab = pkgs.callPackage ./packages/nonfree/matlab {
+    matlab = pkgs.callPackage ./nonfree/matlab {
       fileInstallationKey = secret.matlabKey;
       matlabIso = file:///opt/MATLAB-R2015a-Linux64.iso;
       licensePath = ./include/license.dat;
@@ -110,65 +112,63 @@ in {
       licenseAgreed = true;
     };
 
-    huniepop = pkgs.callPackage ./packages/nonfree/huniepop {};
+    nailgunClient = pkgs.callPackage ./nailgun-client {};
 
-    nailgunClient = pkgs.callPackage ./packages/nailgun-client {};
+#    kframework = pkgs.callPackage ./kframework {};
 
-#    kframework = pkgs.callPackage ./packages/kframework {};
+    tinycbor = pkgs.callPackage ./tinycbor {};
+    libcbor = pkgs.callPackage ./libcbor {};
+    herbie = pkgs.callPackage ./herbie {};
 
-    tinycbor = pkgs.callPackage ./packages/tinycbor {};
-    libcbor = pkgs.callPackage ./packages/libcbor {};
-    herbie = pkgs.callPackage ./packages/herbie {};
+    zscreen = pkgs.callPackage ./zscreen {};
 
-    zscreen = pkgs.callPackage ./packages/zscreen {};
+    git-credential-gnome-keyring = pkgs.callPackage ./git-cred-gnome {};
 
-    git-credential-gnome-keyring = pkgs.callPackage ./packages/git-cred-gnome {};
+    libxcomp = pkgs.callPackage ./libxcomp {};
 
-    libxcomp = pkgs.callPackage ./packages/libxcomp {};
+    xfoil = pkgs.callPackage ./xfoil {};
 
-    xfoil = pkgs.callPackage ./packages/xfoil {};
+    nxproxy = pkgs.callPackage ./nxproxy {};
 
-    nxproxy = pkgs.callPackage ./packages/nxproxy {};
+    x2goclient = pkgs.callPackage ./x2goclient {};
 
-    x2goclient = pkgs.callPackage ./packages/x2goclient {};
+    # netctl = pkgs.callPackage ./netctl {};
 
-    # netctl = pkgs.callPackage ./packages/netctl {};
+    scrape-html = pkgs.callPackage ./scrape-html {};
 
-    scrape-html = pkgs.callPackage ./packages/scrape-html {};
+    chrome-timer = pkgs.callPackage ./chrome-timer {};
 
-    chrome-timer = pkgs.callPackage ./packages/chrome-timer {};
+    miraclecast = pkgs.callPackage ./miraclecast {};
 
-    miraclecast = pkgs.callPackage ./packages/miraclecast {};
-
-    ceta = pkgs.callPackage ./packages/ceta {};
+    ceta = pkgs.callPackage ./ceta {};
 
     maude26 = pkgs.maude;
-    
-    maude27 = pkgs.callPackage ./packages/maude {};
 
-    maude = maude27;   
+    maude27 = pkgs.callPackage ./maude {};
 
-    # yakyak = pkgs.callPackage ./packages/yakyak {};
+    maude = maude27;
 
-    hipspec = pkgs.haskellPackages.callPackage ./packages/hipspec {};
+    yakyak = pkgs.callPackage ./yakyak {};
+
+    hipspec = pkgs.haskellPackages.callPackage ./hipspec {};
 
     #lxqt = lxqt09;
 
     # lxqt010 = pkgs.recurseIntoAttrs
-    #   (import ./packages/lxqt-0.10 {
+    #   (import ./lxqt-0.10 {
     #      pkgs = pkgs;
     #      newScope = pkgs.newScope;
     #    });
 
     #lxqt09 = pkgs.recurseIntoAttrs
-    #  (import ./packages/lxqt-0.9 {
+    #  (import ./lxqt-0.9 {
     #     pkgs = pkgs;
     #     newScope = pkgs.newScope;
     #   });
 
-    #wpa_supplicant = pkgs.callPackage ./packages/wpa_supplicant {};
+    #wpa_supplicant = pkgs.callPackage ./wpa_supplicant {};
 
-    qtspim = pkgs.callPackage ./packages/qtspim {};
+    qtspim = pkgs.callPackage ./qtspim {};
 
     westonRift = pkgs.weston.overrideDerivation (old: {
       src = pkgs.fetchFromGitHub {
@@ -198,6 +198,18 @@ in {
     #idea = pkgs.idea.override { jdk = pkgs.oraclejdk8; };
 
     setName = pkgs.lib.setName;
+
+    # for some reason chromium ends up building from source
+    chromium = (import <nixpkgs> { config.packageOverrides = pkgs: {}; }).chromium.override {
+      enablePepperFlash = true;
+      enableWideVine    = true;
+    };
+
+    slimlock = pkgs.runCommand "slimlock" {} ''
+        mkdir -p $out/bin
+        ln -s ${pkgs.slim}/bin/slimlock $out/bin/slimlock
+        ln -s ${pkgs.slim}/bin/slimlock $out/bin/xflock4
+    '';
 
 #    qt5Override = pkgs.qt5.base.overrideDerivation;
 #
@@ -324,17 +336,17 @@ in {
     });
 
     chromiumFixed =
-      let oldName = pkgs.chromium.name;
+      let oldName = chromium.name;
           version = (builtins.parseDrvName oldName).version;
       in pkgs.stdenv.mkDerivation {
         name = "chromium-fixed-${version}";
         buildInputs = [ pkgs.makeWrapper ];
         phases = "installPhase";
         installPhase = ''
-            makeWrapper ${pkgs.chromium}/bin/chromium $out/bin/chromium \
+            makeWrapper ${chromium}/bin/chromium $out/bin/chromium \
               --set LD_PRELOAD ""
             ln -sv $out/bin/chromium $out/bin/chromium-browser
-            ln -sv ${pkgs.chromium}/share $out/share
+            ln -sv ${chromium}/share $out/share
         '';
      };
 
@@ -378,6 +390,31 @@ in {
         sha256 = "01wiqrc7xxvk7kzgw756jahwa0szb200l8030iwfcgxb679k3v0j";
       };
     });
+
+    sphinxbase = pkgs.sphinxbase.overrideDerivation (old: rec {
+      name = "sphinxbase-5prealpha";
+      src = pkgs.fetchurl {
+        url = "mirror://sourceforge/cmusphinx/${name}.tar.gz";
+        sha256 = "0vr4k8pv5a8nvq9yja7kl13b5lh0f9vha8fc8znqnm8bwmcxnazp";
+      };
+      nativeBuildInputs = old.nativeBuildInputs ++ [ pkgs.swig pkgs.python27 ];
+    });
+
+    pocketsphinx = pkgs.pocketsphinx.overrideDerivation (old: rec {
+      name = "pocketsphinx-5prealpha";
+      src = pkgs.fetchurl {
+        url = "mirror://sourceforge/cmusphinx/${name}.tar.gz";
+        sha256 = "1n9yazzdgvpqgnfzsbl96ch9cirayh74jmpjf7svs4i7grabanzg";
+      };
+      nativeBuildInputs = ([ sphinxbase pkgs.pkgconfig pkgs.swig pkgs.python27 ]
+                           ++ pkgs.gst_all_1.gstreamer.all
+                           ++ pkgs.gst_all_1.gst-plugins-base.all);
+      patches = [ ./pocketsphinx/fix-gstreamer-caps.patch ];
+    });
+
+    #arcane-fixes = /home/remy/Documents/NotWork/Projects/C++/arcane-chat/fixes;
+
+    #gst_all_1 = pkgs.recurseIntoAttrs (pkgs.callPackage "${arcane-fixes}/gstreamer" {});
 
     gccFull = pkgs.wrapCC (pkgs.gcc5.cc.override {
       langC       = true;
@@ -448,38 +485,50 @@ in {
     # };
 
     perlPackages = pkgs.perlPackages // {
-      GetoptDeclare = pkgs.callPackage ./packages/perlPackages/GetoptDeclare {};
-      TextBalanced  = pkgs.callPackage ./packages/perlPackages/TextBalanced {};
+      GetoptDeclare = pkgs.callPackage ./perlPackages/GetoptDeclare {};
+      TextBalanced  = pkgs.callPackage ./perlPackages/TextBalanced {};
     };
 
     # goPackages = pkgs.goPackages // {
-    #   asciinema = pkgs.callPackage ./packages/goPackages/asciinema {};
-    #   color     = pkgs.callPackage ./packages/goPackages/color {};
-    #   pup       = pkgs.callPackage ./packages/goPackages/pup {};
+    #   asciinema = pkgs.callPackage ./goPackages/asciinema {};
+    #   color     = pkgs.callPackage ./goPackages/color {};
+    #   pup       = pkgs.callPackage ./goPackages/pup {};
     # };
 
-    # nodePackages = pkgs.callPackage ./packages/nodePackages { inherit pkgs; };
+    makeNodePackages = (args:
+      pkgs.callPackage ./nodePackages ({ inherit pkgs; } // args));
 
-    pythonPackagesGen = pp:
-      pkgs.callPackage ./packages/pythonPackages {
-        inherit pkgs;
-        pythonPackages = pp;
-      };
+    myNodePackages_6_x  = makeNodePackages { nodejs = pkgs.nodejs-6_x;  };
+    myNodePackages_5_x  = makeNodePackages { nodejs = pkgs.nodejs-5_x;  };
+    myNodePackages_4_x  = makeNodePackages { nodejs = pkgs.nodejs-4_x;  };
+    myNodePackages_0_10 = makeNodePackages { nodejs = pkgs.nodejs-0_10; };
 
-    pypyPackages     = pythonPackagesGen pkgs.pypyPackages;
+    myNodePackages = myNodePackages_4_x;
 
-    python27Packages = pythonPackagesGen pkgs.python27Packages;
-    python33Packages = pythonPackagesGen pkgs.python33Packages;
-    python34Packages = pythonPackagesGen pkgs.python34Packages;
-    python35Packages = pythonPackagesGen pkgs.python35Packages;
+    # pythonPackagesGen = pp:
+    #   pkgs.callPackage ./pythonPackages {
+    #     inherit pkgs;
+    #     pythonPackages = pp;
+    #   };
+    #
+    # pypyPackages     = pythonPackagesGen pkgs.pypyPackages;
+    #
+    # python27Packages = pythonPackagesGen pkgs.python27Packages;
+    # python33Packages = pythonPackagesGen pkgs.python33Packages;
+    # python34Packages = pythonPackagesGen pkgs.python34Packages;
+    # python35Packages = pythonPackagesGen pkgs.python35Packages;
 
-    python2Packages  = python27Packages;
-    python3Packages  = python34Packages;
+    # python2Packages  = pkgs.python27Packages;
+    # python3Packages  = pkgs.python34Packages;
+    # pythonPackages   = pkgs.python27Packages;
+    #
+    # pylint  = python2Packages.pylint;
+    # pylint3 = python3Packages.pylint;
 
-    pylint  = python2Packages.pylint;
-    pylint3 = python3Packages.pylint;
-
-    haskellPackages = pkgs.callPackage ./packages/haskellPackages { pkgs = pkgs; };
+    haskellPackages = pkgs.callPackage ./haskellPackages {
+      inherit pkgs;
+      inherit (pkgs) haskellPackages;
+    };
 
     profiledHaskellPackages = pkgs.haskellPackages.override {
       overrides = self: super: {
@@ -489,7 +538,7 @@ in {
       };
     };
 
-    hoogleEnabled = true;
+    hoogleEnabled = false;
 
     ghcWith = let hp = haskellPackages;
               in if hoogleEnabled then hp.ghcWithHoogle else hp.ghcWithPackages;
@@ -501,7 +550,43 @@ in {
         ignoreCollisions = true;
       };
 
-    ocamlEnv = pkgs.callPackage ./packages/ocamlwrapper;
+    idrisPackages = pkgs.idrisPackages.override {
+      overrides = self: super: {
+        derive = idrisPackages.build-idris-package {
+          name = "derive-all-the-instances-20161017";
+          src = pkgs.fetchFromGitHub {
+            owner = "taktoa";
+            repo = "derive-all-the-instances";
+            rev = "ddbd418c810b714f2815e97c56a663792567edfd";
+            sha256 = "0qimj31s3x3xbbrmdfn588rdfzrwa2qs9y86fd14ym79jxfk9xb0";
+          };
+          buildInputs = with idrisPackages; [ prelude base pruviloj ];
+        };
+
+        lightyear = idrisPackages.build-idris-package {
+          name = "lightyear-20160701";
+          src = pkgs.fetchFromGitHub {
+            owner = "ziman";
+            repo = "lightyear";
+            rev = "9420f9e892e23a7016dea1a61d8ce43a6d4ecf15";
+            sha256 = "0xbjwq7sk4x78mi2zcqxbx7wziijlr1ayxihb1vml33lqmsgl1dn";
+          };
+          buildInputs = with idrisPackages; [ prelude base effects ];
+        };
+
+        wl-pprint = super.wl-pprint.overrideDerivation (old: {
+          name = "wl-pprint-20161007";
+          src = pkgs.fetchFromGitHub {
+            owner = "shayan-najd";
+            repo = "wl-pprint";
+            rev = "1d365fcf4ba075859844dbc5eb96a90f57b9f338";
+            sha256 = "0g7c3y9smifdz4sivi3qmvymhdr7v9kfq45fmfmmvkqcrix0spzn";
+          };
+        });
+      };
+    };
+
+    ocamlEnv = pkgs.callPackage ./ocamlwrapper;
 
     # guileEnv = guilePackages.misc.guilewrapper;
 
@@ -542,7 +627,7 @@ in {
     #   };
     # });
 
-    gradle26 = pkgs.callPackage ./packages/gradle26 {};
+    gradle26 = pkgs.callPackage ./gradle26 {};
     gradle = gradle26;
 
 #                                *--------------*
@@ -600,6 +685,7 @@ in {
         rtags
         screen
         screenfetch
+        slimlock
         sloccount
         smartmontools
         socat
@@ -615,7 +701,6 @@ in {
         xcape
         xclip
         xlibs.xev
-        xlockmore
         xlsfonts
         zip
         zsh
@@ -699,7 +784,9 @@ in {
         evince
         fbreader
         filezilla
+        firefox
         gnome3.seahorse
+        gsettings_desktop_schemas
         quassel
         lxappearance
         paprefs
@@ -711,6 +798,7 @@ in {
         unetbootin
         weston
         wpa_supplicant_gui
+        yakyak
         zeal
       ];
     };
@@ -769,8 +857,8 @@ in {
         pointfree        #: Utility for transforming Haskell to pointfree form
         pointful         #: Utility for transforming Haskell to pointful form
         djinn            #: Find function definitions via parametricity
-        #~darcs          #: Haskell version control tool
-        #~git-annex      #: Manage large files with git
+        darcs            #: Haskell version control tool
+        git-annex        #: Manage large files with git
         cgrep            #: Semantic code search
         bench            #: Benchmarking for command-line programs
         xml-to-json      #: Convert XML to JSON
@@ -787,7 +875,7 @@ in {
         # Source manipulation
         ghc-mod              #: Enrich Haskell editing
         #~halberd            #: Add missing imports to a Haskell file
-        #~hasktags           #: Generate vim/Emacs tags files from Haskell
+        hasktags             #: Generate vim/Emacs tags files from Haskell
         hdevtools            #: Development tools for Haskell
         hlint                #: Check for code smell in Haskell source
         hindent              #: Haskell source formatter
@@ -797,26 +885,29 @@ in {
         c2hsc                #: FFI helpers
 
         # Build systems
-        cabal-install  #: Haskell package manager
-        stack          #: Wrapper around Cabal
-        pkgs.cabal2nix #: Generate Nix packages from Cabal files
+        cabal-install    #: Haskell package manager
+        #~stack          #: Wrapper around Cabal
+        pkgs.cabal2nix   #: Generate Nix packages from Cabal files
+        shake            #: Haskell-based build system
+        shake-language-c #: Shake rules for building C, C++, and Objective C
+        shake-minify     #: Shake rules for source minification
 
         # Development
-        haddock-api
-        haddocset
+        haddocset    #: Generate Dash/Zeal docsets from Haddock documentation
         haskell-docs #: Documentation browser
         intero       #: Improved version of ghci
+        haddock-api  #: The Haddock API
         ghc          #: GHC API
-        ghc.doc
+        ghc.doc      #: GHC documentation
 
         # Pandoc
         pandoc          #: Convert text files easily
         pandoc-citeproc #: Use the Citation Style Language with Pandoc
 
         # Hakyll
-        hakyll      #: A static site generator written in Haskell
-        #~mighttpd2 #: A Warp-based static web server
-        warp-tls    #: TLS support for Warp
+        hakyll    #: A static site generator written in Haskell
+        mighttpd2 #: A Warp-based static web server
+        warp-tls  #: TLS support for Warp
 
         # XMonad
         DescriptiveKeys    #: Specify self-documenting XMonad keybindings
@@ -865,7 +956,6 @@ in {
         type-level-sets      #: Type level sets
         singletons           #: Singletons
 
-
         ### System IO
         path           #: A type-safe file path abstraction
         path-io        #: An interface to `directory` using types from `path`
@@ -889,15 +979,18 @@ in {
         hyphenation #: Hyphenate / line-break text
 
         ### General text processing
-        pcre-heavy #: Usable version of pcre-light
-        regex-tdfa #: Regular expressions through tagged DFAs
-        #~peggy    #: PEG grammars
-        parsers    #: Generate parsers from a single definition
-        trifecta   #: A user-friendly and effective parser library
-        boomerang  #: Reversible parsing
-        attoparsec #: Faster version of Parsec
-        parsec     #: Monadic parser combinators
-        megaparsec #: A better version of Parsec
+        pcre-heavy  #: Usable version of pcre-light
+        regex-tdfa  #: Regular expressions through tagged DFAs
+        #~peggy     #: PEG grammars
+        parsers     #: Generate parsers from a single definition
+        trifecta    #: A user-friendly and effective parser library
+        boomerang   #: Reversible parsing
+        attoparsec  #: Faster version of Parsec
+        parsec      #: Monadic parser combinators
+        megaparsec  #: A better version of Parsec
+        Earley      #: Earley parsers
+        BNFC        #: BNF compiler
+        #~BNFC-meta #: TH support for BNFC
 
         ### Binary serialization
         cereal                #: Binary serialization
@@ -923,9 +1016,9 @@ in {
 
         ### Web data processing
         aeson          #: Parse/render JSON
-        #~aeson-diff   #: Diff JSON
-        #~aeson-lens   #: Lenses for Aeson
-        #~hjsonschema  #: JSON Schema validator
+        aeson-diff     #: Diff JSON
+        aeson-lens     #: Lenses for Aeson
+        hjsonschema    #: JSON Schema validator
         html-conduit   #: Parse/render HTML
         blaze-html     #: HTML combinators for Haskell
         css-text       #: Parse/render CSS
@@ -934,16 +1027,16 @@ in {
         ### Language processing
         haskell-src-exts #: Parse/render Haskell
         hint             #: Interpret Haskell
-        #~s-cargot       #: S-expression parser in Haskell
+        s-cargot         #: S-expression parser in Haskell
 
         ### Image processing
-        gloss                #: Easy-to-use bindings to OpenGL
-        FontyFruity          #: A Haskell TrueType parser
-        JuicyPixels          #: Load and store images in a variety of formats
-        Rasterific           #: A rasterizer written in pure Haskell
-        friday               #: Functional image processing
-        #~friday-juicypixels #: Utilities for converting between friday and JP types
-        friday-scale-dct     #: Scale friday images with DCT
+        gloss              #: Easy-to-use bindings to OpenGL
+        FontyFruity        #: A Haskell TrueType parser
+        JuicyPixels        #: Load and store images in a variety of formats
+        Rasterific         #: A rasterizer written in pure Haskell
+        friday             #: Functional image processing
+        friday-juicypixels #: Convert between friday and JuicyPixels types
+        friday-scale-dct   #: Scale friday images with DCT
 
         ### Graph processing
         graphviz        #: Bindings to the graphviz visualization library
@@ -980,6 +1073,8 @@ in {
         conduit                #: Deterministic resource handling for Haskell IO
         conduit-combinators    #: Commonly-used combinators for conduit
         classy-prelude-conduit #: Conduit instances for classy-prelude
+        conduit-audio          #: Conduits for audio
+        conduit-audio-sndfile  #: conduit-audio + sndfile
         pipes                  #: Pipes
         pipes-concurrency      #: Concurrency for pipes
         pipes-safe             #: Resource management and exceptions for pipes
@@ -1005,7 +1100,7 @@ in {
         ### Testing
         HUnit                   #: HUnit is a testing framework for Haskell
         hspec                   #: Hspec is a testing framework for Haskell
-        #~hspec-webdriver       #: Hspec support for webdriver
+        hspec-webdriver         #: Hspec support for webdriver
         hspec-laws              #: Test laws for standard type classes
         hspec-attoparsec        #: Test your attoparsec parsers with hspec
         hspec-expectations      #: Hspec combinators
@@ -1024,12 +1119,30 @@ in {
         ekg       #: Get information on a Haskell application
 
         ### Debugging
+        debug-diff #: Do a colorized diff between two Haskell values
         #~editable #: Edit data types on the command line
 
         ### Compilers
-        #~llvm
-        #~llvm-general
-        #~llvm-general-pure
+        abt                 #: Abstract binding trees
+        #~bound             #: Easy to use name binding
+        #~llvm              #: Bindings to the LLVM compiler toolkit
+        #~llvm-general      #: General purpose LLVM bindings
+        llvm-general-pure   #: Pure Haskell LLVM functionality (no FFI)
+        language-c          #: C parser and pretty-printer library
+        language-dot        #: Graphviz DOT parser and pretty-printer library
+        language-javascript #: Javascript parser and pretty-printer library
+        language-lua        #: Lua parser and pretty-printer library
+        language-nix        #: Nix parser and pretty-printer library
+        hnix                #: Nix parser and pretty-printer library
+        unification-fd      #: Simple generic unification algorithms
+        term-rewriting      #: Yet another term-rewriting library
+
+        ### FPGA
+        clash-lib           #: A functional hardware description language
+        clash-prelude       #: A functional hardware description language
+        clash-vhdl          #: VHDL backend for Clash
+        clash-verilog       #: Verilog backend for Clash
+        clash-systemverilog #: SystemVerilog backend for Clash
 
         ### Compression
         lz4    #: The LZ4 compression format
@@ -1037,7 +1150,7 @@ in {
         snappy #: The Snappy compression format
         bzlib  #: The bz2 compression format
         zlib   #: The gzip and zlib compression formats
-        libvorbis
+
         ### Archives
         zip-archive        #: The zip archive format
         tar                #: The tar archive format
@@ -1046,9 +1159,6 @@ in {
         ### Miscellaneous
         data-default   #: Default values for data types
         optional-args  #: A type for specifying optional function arguments
-        unification-fd #: Simple generic unification algorithms
-        hnix           #: Haskell implementation of Nix
-        #~bound        #: Variable bindings
         #~DataTreeView #: A GTK widget for viewing generic instances of Data
         #~dynamic-plot #: Plot continuous/infinite data structures efficiently
         mecha          #: Constructive solid modeling
@@ -1065,10 +1175,10 @@ in {
 
         ### Arrays
         matrix            #: Matrices based on Data.Vector
-        #~accelerate      #: A high-performance embedded array language
-        #~accelerate-io   #: Conversion between accelerate and various backends
-        #~repa            #: Regular parallel arrays
-        #~repa-io         #: Regular parallel arrays -- IO
+        accelerate        #: A high-performance embedded array language
+        accelerate-io     #: Conversion between accelerate and various backends
+        repa              #: Regular parallel arrays
+        repa-io           #: Regular parallel arrays -- IO
         vector            #: Mutable and immutable Int-indexed arrays
         vector-algorithms #: Efficient algorithms for vector arrays
         vector-instances  #: Orphan instances for the vector package
@@ -1088,17 +1198,17 @@ in {
         http-conduit #: Conduit adapter for http-client
 
         ### Web servers
-        servant          #: A family of combinators for defining webservices APIs
-        servant-server   #: Create servers from servant specifications
-        servant-client   #: Autogenerate Haskell to query servant APIs
-        servant-blaze    #: Servant support for blaze-html
-        #~servant-jquery #: Autogenerate JavaScript to query servant APIs
-        servant-pandoc   #: Create servant API documentation with Pandoc
-        scotty           #: A web microframework
-        websockets       #: WebSocket-capable servers
-        socket-io        #: A Socket.io server
-        yesod            #: A web framework
-        warp             #: A high-performance web server
+        servant        #: A family of combinators for defining webservices APIs
+        servant-server #: Create servers from servant specifications
+        servant-client #: Autogenerate Haskell to query servant APIs
+        servant-blaze  #: Servant support for blaze-html
+        servant-js     #: Autogenerate JavaScript to query servant APIs
+        servant-pandoc #: Create servant API documentation with Pandoc
+        scotty         #: A web microframework
+        websockets     #: WebSocket-capable servers
+        socket-io      #: A Socket.io server
+        yesod          #: A web framework
+        warp           #: A high-performance web server
 
         ### Databases
         persistent            #: Type-safe, multi-backend data serialization
@@ -1134,7 +1244,7 @@ in {
         ## ----------------------------- Graphics ------------------------------
 
         ### GUI
-        #~threepenny-gui #: FRP GUI using locally-served HTML
+        threepenny-gui #: FRP GUI using locally-served HTML
 
         ### Chart
         Chart       #: Generate 2D charts and plots
@@ -1143,15 +1253,18 @@ in {
 
         ### Diagrams
         diagrams
+        diagrams-svg
+        diagrams-cairo
+        diagrams-graphviz
         diagrams-rasterific
         rasterific-svg
 
         ### Functional Reactive Programming
-        #~varying          #: FRP framework
-        reactive-banana    #: FRP framework
-        frpnow             #: FRP framework
+        varying            #: FRP framework
         reflex             #: FRP framework
+        reactive-banana    #: FRP framework
         reactive-banana-wx #: wxWidgets for reactive-banana
+        frpnow             #: FRP framework
         frpnow-gtk         #: GTK for frpnow
 
         ### Bindings
@@ -1170,7 +1283,13 @@ in {
       name = "idrisPkgs";
       paths = with pkgs; [
         (with idrisPackages; with-packages [
-          base prelude
+          base
+          prelude
+          effects
+          contrib
+          pruviloj
+          derive
+          wl-pprint
         ])
       ];
     };
@@ -1235,7 +1354,7 @@ in {
         nox
         patchelf
         nixpkgs-lint
-        #nixpkgs-manual
+        nixpkgs-manual
       ];
     };
 
@@ -1341,7 +1460,6 @@ in {
       paths = with pkgs; [
         bazaar
         cvs
-        gitAndTools.git-annex
         gitFull
         git-credential-gnome-keyring
         mercurial

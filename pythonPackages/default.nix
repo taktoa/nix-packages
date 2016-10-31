@@ -192,4 +192,27 @@ in pythonPackages // (rec {
     maintainers  = with lib.maintainers; [ taktoa ];
     platforms    = with lib.platforms; all;
   });
+
+  pocketsphinx-python = mkPython (rec {
+    packageName  = "pocketsphinx";
+    version      = "0.1.3";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "0v9l43s6s256qy4bs31akvmqkkrxdkk8mld40s3vfnn8xynml4mc";
+    propDeps     = with pkgs; [ swig libpulseaudio pocketsphinx ];
+    doCheck      = false;
+  });
+  
+  SpeechRecognition = mkPython (rec {
+    packageName  = "SpeechRecognition";
+    version      = "3.4.6";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "0cdci4nxyyfg2jrzhrnm3hvqcb1w8w3gym6dr9nl1rh2y4ssngir";
+    propDeps     = with pkgs; [ pyaudio flac pocketsphinx-python ];
+    homepage     = "https://github.com/Uberi/speech_recognition";
+    description  = "Speech recognition library.";
+    license      = with lib.licenses; [ bsd3.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;    
+    doCheck      = false;
+  });
 })
