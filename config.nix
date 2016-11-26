@@ -1,5 +1,6 @@
 { secret }:
 
+
 {
 
 # ------------------------------------------------------------------------------
@@ -505,25 +506,25 @@
 
     myNodePackages = myNodePackages_4_x;
 
-    # pythonPackagesGen = pp:
-    #   pkgs.callPackage ./pythonPackages {
-    #     inherit pkgs;
-    #     pythonPackages = pp;
-    #   };
-    #
-    # pypyPackages     = pythonPackagesGen pkgs.pypyPackages;
-    #
-    # python27Packages = pythonPackagesGen pkgs.python27Packages;
-    # python33Packages = pythonPackagesGen pkgs.python33Packages;
-    # python34Packages = pythonPackagesGen pkgs.python34Packages;
-    # python35Packages = pythonPackagesGen pkgs.python35Packages;
+    pythonPackagesGen = pp:
+      pkgs.callPackage ./pythonPackages {
+        inherit pkgs;
+        pythonPackages = pp;
+      };
 
-    # python2Packages  = pkgs.python27Packages;
-    # python3Packages  = pkgs.python34Packages;
-    # pythonPackages   = pkgs.python27Packages;
-    #
-    # pylint  = python2Packages.pylint;
-    # pylint3 = python3Packages.pylint;
+    pypyPackages     = pythonPackagesGen pkgs.pypyPackages;
+
+    python27Packages = pythonPackagesGen pkgs.python27Packages;
+    python33Packages = pythonPackagesGen pkgs.python33Packages;
+    python34Packages = pythonPackagesGen pkgs.python34Packages;
+    python35Packages = pythonPackagesGen pkgs.python35Packages;
+
+    python2Packages  = pkgs.python27Packages;
+    python3Packages  = pkgs.python34Packages;
+    pythonPackages   = pkgs.python27Packages;
+
+    pylint  = python2Packages.pylint;
+    pylint3 = python3Packages.pylint;
 
     haskellPackages = pkgs.callPackage ./haskellPackages {
       inherit pkgs;
@@ -538,10 +539,9 @@
       };
     };
 
-    hoogleEnabled = false;
+    hoogleEnabled = true;
 
-    ghcWith = let hp = haskellPackages;
-              in if hoogleEnabled then hp.ghcWithHoogle else hp.ghcWithPackages;
+    ghcWith = (if hoogleEnabled then haskellPackages.ghcWithHoogle else haskellPackages.ghcWithPackages);
 
     haskellEnv = { name, paths }:
       pkgs.buildEnv {
@@ -630,6 +630,11 @@
     gradle26 = pkgs.callPackage ./gradle26 {};
     gradle = gradle26;
 
+    resume-cli = pkgs.callPackage ./resume-cli {};
+
+    rapidcheck = pkgs.callPackage ./rapidcheck {};
+
+
 #                                *--------------*
 # -------------------------------- Package sets --------------------------------
 #                                *--------------*
@@ -681,6 +686,7 @@
         psmisc
         pv
         ranger
+        resume-cli
         rlwrap
         rtags
         screen
@@ -849,8 +855,8 @@
         hledger          #: A Haskell-based double-entry accounting system
         hledger-lib      #: Core data types, parsers and utilities for HLedger
         hledger-interest #: Computes interest for a given account in HLedger
-        hledger-irr      #: Computes the internal rate of return with HLedger
-        hledger-diff     #: Compares the transactions in two HLedger files
+        #hledger-irr     #: Computes the internal rate of return with HLedger
+        #hledger-diff    #: Compares the transactions in two HLedger files
         #hledger-web     #: Web interface for HLedger
 
         # Miscellaneous
@@ -887,10 +893,10 @@
         # Build systems
         cabal-install    #: Haskell package manager
         #~stack          #: Wrapper around Cabal
-        pkgs.cabal2nix   #: Generate Nix packages from Cabal files
+        cabal2nix        #: Generate Nix packages from Cabal files
         shake            #: Haskell-based build system
         shake-language-c #: Shake rules for building C, C++, and Objective C
-        shake-minify     #: Shake rules for source minification
+        #~shake-minify   #: Shake rules for source minification
 
         # Development
         haddocset    #: Generate Dash/Zeal docsets from Haddock documentation
@@ -905,7 +911,7 @@
         pandoc-citeproc #: Use the Citation Style Language with Pandoc
 
         # Hakyll
-        hakyll    #: A static site generator written in Haskell
+        #~hakyll  #: A static site generator written in Haskell
         mighttpd2 #: A Warp-based static web server
         warp-tls  #: TLS support for Warp
 
@@ -930,7 +936,7 @@
         ## ------------------------------ General ------------------------------
 
         ### Prelude
-        classy-prelude #: A typeclass-based prelude
+        #~classy-prelude #: A typeclass-based prelude
 
         ### Unicode
         base-unicode-symbols       #: Unicode Prelude
@@ -955,6 +961,7 @@
         derive               #: Tools for deriving instances in Haskell
         type-level-sets      #: Type level sets
         singletons           #: Singletons
+        recursion-schemes    #: Generalized bananas, lenses, and barbed wire
 
         ### System IO
         path           #: A type-safe file path abstraction
@@ -965,6 +972,7 @@
         gitlib         #: A high-level interface to the Git API
         gitlib-libgit2 #: The libgit2 backend to gitlib
         filestore      #: A high-level interface to multiple versioning file stores
+        mmap           #: Gives access to the mmap syscall
 
         ### Dates and times
         time    #: Time manipulation
@@ -972,11 +980,11 @@
         clock   #: Access to high-resolution clock and timer functions
 
         ### Text manipulation
-        bytestring  #: Lazy and strict packed bytestrings
-        split       #: Split strings and lists
-        text        #: Packed unicode strings
-        text-icu    #: Unicode functions for Data.Text
-        hyphenation #: Hyphenate / line-break text
+        bytestring    #: Lazy and strict packed bytestrings
+        split         #: Split strings and lists
+        text          #: Packed unicode strings
+        text-icu      #: Unicode functions for Data.Text
+        #~hyphenation #: Hyphenate / line-break text
 
         ### General text processing
         pcre-heavy  #: Usable version of pcre-light
@@ -991,6 +999,9 @@
         Earley      #: Earley parsers
         BNFC        #: BNF compiler
         #~BNFC-meta #: TH support for BNFC
+        derp        #: Derivative parsers
+        happy       #: Haskell parser generator
+        alex        #: Haskell lexer generator
 
         ### Binary serialization
         cereal                #: Binary serialization
@@ -1025,23 +1036,24 @@
         email-validate #: Parse/render email addresses
 
         ### Language processing
-        haskell-src-exts #: Parse/render Haskell
-        hint             #: Interpret Haskell
-        s-cargot         #: S-expression parser in Haskell
+        haskell-src             #: Parse/render Haskell
+        haskell-src-exts_1_18_2 #: Parse/render Haskell
+        hint                    #: Interpret Haskell
+        s-cargot                #: S-expression parser in Haskell
 
         ### Image processing
-        gloss              #: Easy-to-use bindings to OpenGL
-        FontyFruity        #: A Haskell TrueType parser
-        JuicyPixels        #: Load and store images in a variety of formats
-        Rasterific         #: A rasterizer written in pure Haskell
-        friday             #: Functional image processing
-        friday-juicypixels #: Convert between friday and JuicyPixels types
-        friday-scale-dct   #: Scale friday images with DCT
+        gloss                #: Easy-to-use bindings to OpenGL
+        FontyFruity          #: A Haskell TrueType parser
+        JuicyPixels          #: Load and store images in a variety of formats
+        Rasterific           #: A rasterizer written in pure Haskell
+        #~friday             #: Functional image processing
+        #~friday-juicypixels #: Convert between friday and JuicyPixels types
+        #~friday-scale-dct   #: Scale friday images with DCT
 
         ### Graph processing
-        graphviz        #: Bindings to the graphviz visualization library
-        fgl             #: The Functional Graph Library
-        graph-rewriting #: Monadic EDSL for graph rewriting
+        graphviz          #: Bindings to the graphviz visualization library
+        fgl               #: The Functional Graph Library
+        #~graph-rewriting #: Monadic EDSL for graph rewriting
 
         ### Network
         pcap #: Bindings to libpcap
@@ -1070,32 +1082,32 @@
         resource-pool #: A pooling abstraction for collections of resources
 
         ### Iteratees
-        conduit                #: Deterministic resource handling for Haskell IO
-        conduit-combinators    #: Commonly-used combinators for conduit
-        classy-prelude-conduit #: Conduit instances for classy-prelude
-        conduit-audio          #: Conduits for audio
-        conduit-audio-sndfile  #: conduit-audio + sndfile
-        pipes                  #: Pipes
-        pipes-concurrency      #: Concurrency for pipes
-        pipes-safe             #: Resource management and exceptions for pipes
-        pipes-http             #: Network sockets for pipes
-        pipes-network          #: Network sockets for pipes
-        #~pipes-network-tls    #: TLS network sockets for pipes
-        pipes-attoparsec       #: Parsing for pipes
-        pipes-bytestring       #:
-        pipes-extras           #:
-        pipes-group            #:
-        pipes-parse            #:
-        pipes-wai              #:
-        #~pipes-courier        #:
-        pipes-text             #:
-        pipes-aeson            #:
-        pipes-binary           #:
-        pipes-zlib             #:
-        pipes-csv              #:
-        #~pipes-shell          #:
-        pipes-zeromq4          #:
-        process-streaming      #:
+        conduit                  #: Deterministic resource handling for Haskell
+        conduit-combinators      #: Commonly-used combinators for conduit
+        #~classy-prelude-conduit #: Conduit instances for classy-prelude
+        conduit-audio            #: Conduits for audio
+        conduit-audio-sndfile    #: conduit-audio + sndfile
+        pipes                    #: Pipes
+        pipes-concurrency        #: Concurrency for pipes
+        pipes-safe               #: Resource management and exceptions for pipes
+        pipes-http               #: Network sockets for pipes
+        pipes-network            #: Network sockets for pipes
+        #~pipes-network-tls      #: TLS network sockets for pipes
+        pipes-attoparsec         #: Parsing for pipes
+        pipes-bytestring         #:
+        pipes-extras             #:
+        pipes-group              #:
+        pipes-parse              #:
+        pipes-wai                #:
+        #~pipes-courier          #:
+        pipes-text               #:
+        pipes-aeson              #:
+        #~pipes-binary           #:
+        pipes-zlib               #:
+        pipes-csv                #:
+        #~pipes-shell            #:
+        #~pipes-zeromq4          #:
+        process-streaming        #:
 
         ### Testing
         HUnit                   #: HUnit is a testing framework for Haskell
@@ -1113,6 +1125,7 @@
         tasty-smallcheck        #: Tasty support for SmallCheck
         tasty-ant-xml           #: Jenkins output for Tasty
         doctest                 #: Run examples in documentation as tests
+        fitspec                 #: Evolve functions from examples
 
         ### Benchmarking
         criterion #: Benchmarking library for Haskell
@@ -1123,11 +1136,11 @@
         #~editable #: Edit data types on the command line
 
         ### Compilers
-        abt                 #: Abstract binding trees
+        #~abt               #: Abstract binding trees
         #~bound             #: Easy to use name binding
         #~llvm              #: Bindings to the LLVM compiler toolkit
         #~llvm-general      #: General purpose LLVM bindings
-        llvm-general-pure   #: Pure Haskell LLVM functionality (no FFI)
+        #~llvm-general-pure #: Pure Haskell LLVM functionality (no FFI)
         language-c          #: C parser and pretty-printer library
         language-dot        #: Graphviz DOT parser and pretty-printer library
         language-javascript #: Javascript parser and pretty-printer library
@@ -1135,7 +1148,7 @@
         language-nix        #: Nix parser and pretty-printer library
         hnix                #: Nix parser and pretty-printer library
         unification-fd      #: Simple generic unification algorithms
-        term-rewriting      #: Yet another term-rewriting library
+        #~term-rewriting    #: Yet another term-rewriting library
 
         ### FPGA
         clash-lib           #: A functional hardware description language
@@ -1157,13 +1170,13 @@
         libarchive-conduit #: Supports many archive formats
 
         ### Miscellaneous
-        data-default   #: Default values for data types
-        optional-args  #: A type for specifying optional function arguments
-        #~DataTreeView #: A GTK widget for viewing generic instances of Data
-        #~dynamic-plot #: Plot continuous/infinite data structures efficiently
-        mecha          #: Constructive solid modeling
-        patches-vector #: An algebraic notion of a patch
-        diff-parse     #: Parse diff files
+        data-default     #: Default values for data types
+        optional-args    #: A type for specifying optional function arguments
+        #~DataTreeView   #: A GTK widget for viewing generic instances of Data
+        #~dynamic-plot   #: Plot continuous/infinite data structures efficiently
+        mecha            #: Constructive solid modeling
+        #~patches-vector #: An algebraic notion of a patch
+        #~diff-parse     #: Parse diff files
 
         ## -------------------------- Data structures --------------------------
 
@@ -1176,7 +1189,7 @@
         ### Arrays
         matrix            #: Matrices based on Data.Vector
         accelerate        #: A high-performance embedded array language
-        accelerate-io     #: Conversion between accelerate and various backends
+        #~accelerate-io   #: Conversion between accelerate and various backends
         repa              #: Regular parallel arrays
         repa-io           #: Regular parallel arrays -- IO
         vector            #: Mutable and immutable Int-indexed arrays
@@ -1198,17 +1211,17 @@
         http-conduit #: Conduit adapter for http-client
 
         ### Web servers
-        servant        #: A family of combinators for defining webservices APIs
-        servant-server #: Create servers from servant specifications
-        servant-client #: Autogenerate Haskell to query servant APIs
-        servant-blaze  #: Servant support for blaze-html
-        servant-js     #: Autogenerate JavaScript to query servant APIs
-        servant-pandoc #: Create servant API documentation with Pandoc
-        scotty         #: A web microframework
-        websockets     #: WebSocket-capable servers
-        socket-io      #: A Socket.io server
-        yesod          #: A web framework
-        warp           #: A high-performance web server
+        servant          #: Combinators for defining webservices APIs
+        servant-server   #: Create servers from servant specifications
+        servant-client   #: Autogenerate Haskell to query servant APIs
+        servant-blaze    #: Servant support for blaze-html
+        servant-js       #: Autogenerate JavaScript to query servant APIs
+        #~servant-pandoc #: Create servant API documentation with Pandoc
+        scotty           #: A web microframework
+        websockets       #: WebSocket-capable servers
+        #~socket-io      #: A Socket.io server
+        yesod            #: A web framework
+        warp             #: A high-performance web server
 
         ### Databases
         persistent            #: Type-safe, multi-backend data serialization
@@ -1260,12 +1273,12 @@
         rasterific-svg
 
         ### Functional Reactive Programming
-        varying            #: FRP framework
-        reflex             #: FRP framework
-        reactive-banana    #: FRP framework
-        reactive-banana-wx #: wxWidgets for reactive-banana
-        frpnow             #: FRP framework
-        frpnow-gtk         #: GTK for frpnow
+        varying              #: FRP framework
+        #~reflex             #: FRP framework
+        reactive-banana      #: FRP framework
+        #~reactive-banana-wx #: wxWidgets for reactive-banana
+        frpnow               #: FRP framework
+        frpnow-gtk           #: GTK for frpnow
 
         ### Bindings
         cairo      #: Cairo bindings
@@ -1273,9 +1286,9 @@
         gtk3       #: GTK 3 bindings
         sdl2       #: SDL 2 bindings
         sdl2-cairo #: SDL 2 + Cairo helpers
-        wx         #: wxHaskell
-        wxc        #: wxHaskell
-        wxcore     #: wxHaskell
+        #~wx       #: wxHaskell
+        #~wxc      #: wxHaskell
+        #~wxcore   #: wxHaskell
       ];
     };
 
@@ -1315,7 +1328,7 @@
       paths = with pkgs; [
         ffmpeg
         gimp
-        gtick
+        #gtick
         imagemagick
         lilypond
         mid2key
@@ -1387,38 +1400,39 @@
 
     perlPkgs = buildEnv {
       name = "perlPkgs";
-      paths = with pkgs; with perlPackages; [
-        perl
+      paths = with perlPackages; [
+        # pkgs.perl
+        pkgs.pcre
+        pkgs.rakudo
         GetoptDeclare
         TextDiff
         XMLLibXML
         XMLSAX
         libxml_perl
-        pcre
-        rakudo
       ];
       passthru = { meta = { priority = 0; }; };
     };
 
     pythonPkgs = buildEnv {
       name = "pythonPkgs";
-      paths = with pkgs; with python3Packages; [
-        python
-        pythonPackages.deluge
+      paths = [
+        python27Packages.deluge
         python27Packages.csvkit
         python27Packages.gst-gtklaunch
-        fonttools
-        ipython
-        matplotlib
-        scipy
-        numpy
-        pygments
-        pygobject
-        ptpython
-        jsonpatch
-        pep8
-        flake8
-        autopep8
+
+        python35Packages.python
+        python35Packages.fonttools
+        python35Packages.ipython
+        python35Packages.matplotlib
+        python35Packages.scipy
+        python35Packages.numpy
+        python35Packages.pygments
+        python35Packages.pygobject
+        python35Packages.ptpython
+        python35Packages.jsonpatch
+        python35Packages.pep8
+        python35Packages.flake8
+        python35Packages.autopep8
       ];
     };
 
@@ -1443,23 +1457,25 @@
       ];
     };
 
-    # texPkgs = buildEnv {
-    #   name = "texPkgs";
-    #   paths = with pkgs; [
-    #     texLiveFull
-    #     lmodern
-    #     tipa
-    #     texinfoInteractive
-    #     languagetool
-    #   ];
-    #   ignoreCollisions = true;
-    # };
+    texPkgs = buildEnv {
+      name = "texPkgs";
+      paths = with pkgs; [
+        (texlive.combine {
+          inherit (pkgs.texlive) scheme-full lm tipa;
+        })
+        lmodern
+        texinfoInteractive
+        languagetool
+      ];
+      ignoreCollisions = true;
+    };
 
     vcsPkgs = buildEnv {
       name = "vcsPkgs";
       paths = with pkgs; [
         bazaar
         cvs
+        git-lfs
         gitFull
         git-credential-gnome-keyring
         mercurial

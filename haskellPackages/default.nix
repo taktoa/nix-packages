@@ -41,11 +41,10 @@ in haskellPackages.override {
     haskell-names = dontCheck super.haskell-names;
     s-cargot = dontCheck super.s-cargot;
     friday-juicypixels = dontCheck super.friday-juicypixels;
-    http-client_0_5_3_2 = dontCheck super.http-client_0_5_3_2;
     mighttpd2 = super.mighttpd2.overrideScope (self: super: {
-      http-client = dontCheck super.http-client_0_5_3_2;
+      http-client = super.http-client_0_5_3_3;
       http-client-tls = super.http-client-tls_0_3_3;
-      http-conduit = super.http-conduit_2_2_2_1;
+      http-conduit = super.http-conduit_2_2_3;
     });
     aeson-diff = dontCheck super.aeson-diff;
     # clash-lib = dontCheck super.clash-lib;

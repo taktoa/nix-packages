@@ -98,7 +98,7 @@ in pythonPackages // (rec {
     maintainers  = with lib.maintainers; [ taktoa ];
     platforms    = with lib.platforms; all;
   });
-  
+
   typed-ast = mkPython (rec {
     packageName  = "typed-ast";
     version      = "0.5.3";
