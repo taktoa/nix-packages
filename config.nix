@@ -3,9 +3,10 @@
 
 {
 
-# ------------------------------------------------------------------------------
-# --------------------------- General configuration ----------------------------
-# ------------------------------------------------------------------------------
+
+#<# ┌────────────────────────┬───────────────────────┬─────────────────────────┐
+#<# ├────────────────────────┤ General configuration ├─────────────────────────┤
+#<# └────────────────────────┴───────────────────────┴─────────────────────────┘
 
 
   cabal = {
@@ -28,17 +29,17 @@
   allowUnfree = true;
   allowBroken = true;
 
-# ------------------------------------------------------------------------------
-# ----------------------------| Package overrides |-----------------------------
-# ------------------------------------------------------------------------------
+
+#<# ┌──────────────────────────┬───────────────────┬───────────────────────────┐
+#<# ├──────────────────────────┤ Package overrides ├───────────────────────────┤
+#<# └──────────────────────────┴───────────────────┴───────────────────────────┘
 
 
   packageOverrides = pkgs: rec {
 
-
-#                             *-------------------*
-# ----------------------------| Personal packages |-----------------------------
-#                             *-------------------*
+#<#                            ┌───────────────────┐
+#<# ───────────────────────────┤ Personal packages ├────────────────────────────
+#<#                            └───────────────────┘
 
     nixpkgs-manual = import <nixpkgs/doc>;
 
@@ -115,7 +116,7 @@
 
     nailgunClient = pkgs.callPackage ./nailgun-client {};
 
-#    kframework = pkgs.callPackage ./kframework {};
+    #    kframework = pkgs.callPackage ./kframework {};
 
     tinycbor = pkgs.callPackage ./tinycbor {};
     libcbor = pkgs.callPackage ./libcbor {};
@@ -184,17 +185,14 @@
         ./autogen.sh
       '';
 
-      buildInputs = old.buildInputs ++
-                    (with pkgs; [ automake autoconf libtool ]);
+      buildInputs = old.buildInputs ++ (with pkgs; [automake autoconf libtool]);
     });
 
     # https://github.com/jherico/OculusSDK.git
 
-
-
-#                             *-------------------*
-# ----------------------------- Package overrides ------------------------------
-#                             *-------------------*
+#<#                            ┌───────────────────┐
+#<# ───────────────────────────┤ Package overrides ├────────────────────────────
+#<#                            └───────────────────┘
 
     #idea = pkgs.idea.override { jdk = pkgs.oraclejdk8; };
 
@@ -212,107 +210,107 @@
         ln -s ${pkgs.slim}/bin/slimlock $out/bin/xflock4
     '';
 
-#    qt5Override = pkgs.qt5.base.overrideDerivation;
-#
-#    teamspeakQt5 = setName "teamspeak-qt5" (qt5Override (old: {
-#      nativeBuildInputs = old.nativeBuildInputs ++
-#                          (with pkgs; [ libpulseaudio pcre ]);
-#
-#      propagatedBuildInputs = with pkgs; [
-#        directfb
-#        libpulseaudio
-#        openssl sqlite icu
-#        fontconfig freetype
-#        glib udev dbus.libs
-#        libxml2 libxslt pcre
-#        zlib libjpeg libpng libtiff
-#      ];
-#
-#      configureFlags = ''
-#          -verbose
-#          -confirm-license
-#          -opensource
-#          -shared
-#          -pkg-config
-#          -release
-#          -c++11
-#          -rpath
-#          -strip
-#          -reduce-relocations
-#          -optimized-qmake
-#          -qml-debug
-#          -gui
-#          -widgets
-#          -nis
-#          -iconv
-#          -icu
-#          -pch
-#          -linuxfb
-#          -xcb
-#          -qpa xcb
-#          -glib
-#          -largefile
-#          -pulseaudio
-#          -no-sql-psql
-#          -no-sql-mysql
-#          -no-sql-odbc
-#          -no-sql-tds
-#          -no-sql-oci
-#          -no-sql-db2
-#          -no-sql-ibase
-#          -no-gtkstyle
-#          -no-eglfs
-#          -no-kms
-#          -no-cups
-#          -no-dbus
-#          -no-wayland
-#          -no-opengl
-#          -make   libs
-#          -nomake tools
-#          -nomake examples
-#          -nomake tests
-#          -system-zlib
-#          -system-libpng
-#          -system-libjpeg
-#          -system-sqlite
-#          -openssl-linked
-#          -dbus-linked
-#      '';
-#    }));
-#
-#    teamspeak_client = pkgs.teamspeak_client.override
-#                       { qt5 = { base = teamspeakQt5; }; };
+    #qt5Override = pkgs.qt5.base.overrideDerivation;
+    #
+    #teamspeakQt5 = setName "teamspeak-qt5" (qt5Override (old: {
+    #  nativeBuildInputs = old.nativeBuildInputs ++
+    #                      (with pkgs; [ libpulseaudio pcre ]);
+    #
+    #  propagatedBuildInputs = with pkgs; [
+    #    directfb
+    #    libpulseaudio
+    #    openssl sqlite icu
+    #    fontconfig freetype
+    #    glib udev dbus.libs
+    #    libxml2 libxslt pcre
+    #    zlib libjpeg libpng libtiff
+    #  ];
+    #
+    #  configureFlags = ''
+    #      -verbose
+    #      -confirm-license
+    #      -opensource
+    #      -shared
+    #      -pkg-config
+    #      -release
+    #      -c++11
+    #      -rpath
+    #      -strip
+    #      -reduce-relocations
+    #      -optimized-qmake
+    #      -qml-debug
+    #      -gui
+    #      -widgets
+    #      -nis
+    #      -iconv
+    #      -icu
+    #      -pch
+    #      -linuxfb
+    #      -xcb
+    #      -qpa xcb
+    #      -glib
+    #      -largefile
+    #      -pulseaudio
+    #      -no-sql-psql
+    #      -no-sql-mysql
+    #      -no-sql-odbc
+    #      -no-sql-tds
+    #      -no-sql-oci
+    #      -no-sql-db2
+    #      -no-sql-ibase
+    #      -no-gtkstyle
+    #      -no-eglfs
+    #      -no-kms
+    #      -no-cups
+    #      -no-dbus
+    #      -no-wayland
+    #      -no-opengl
+    #      -make   libs
+    #      -nomake tools
+    #      -nomake examples
+    #      -nomake tests
+    #      -system-zlib
+    #      -system-libpng
+    #      -system-libjpeg
+    #      -system-sqlite
+    #      -openssl-linked
+    #      -dbus-linked
+    #  '';
+    #}));
+    #
+    #teamspeak_client = pkgs.teamspeak_client.override
+    #                   { qt5 = { base = teamspeakQt5; }; };
 
-#    headlessTeamspeak =
-#      let ts3 = pkgs.teamspeak_client;
-#          ts3Version = (builtins.parseDrvName ts3.name).version;
-#          rename = setName "teamspeak-headless-client-${ts3Version}";
-#          inputs = { libpulseaudio = pkgs.libpulseaudio;
-#                     qt5           = { base = teamspeakQt5; };
-#                     freetype      = teamspeakQt5;
-#                     xlibs         = { libxcb = teamspeakQt5; };
-#                     xorg          = { libSM       = teamspeakQt5;
-#                                       libICE      = teamspeakQt5;
-#                                       libXrender  = teamspeakQt5;
-#                                       libXrandr   = teamspeakQt5;
-#                                       libXfixes   = teamspeakQt5;
-#                                       libXcursor  = teamspeakQt5;
-#                                       libXinerama = teamspeakQt5;
-#                                       libXext     = teamspeakQt5;
-#                                       libX11      = teamspeakQt5;
-#                                     };
-#                   };
-#
-#      in rename ((ts3.override inputs).overrideDerivation (old: {
-#        postInstall = ''
-#            mv $out/bin/ts3client $out/bin/headless-teamspeak
-#            mv $out/lib/teamspeak $out/lib/headless-teamspeak
-#            rm $out/bin/.ts3client-wrapped
-#            ln -s $out/lib/headless-teamspeak/ts3client \
-#                  $out/bin/.ts3client-wrapped
-#            rm -rf $out/share
-#        '';
-#      }));
+    #headlessTeamspeak =
+    #  let ts3 = pkgs.teamspeak_client;
+    #      ts3Version = (builtins.parseDrvName ts3.name).version;
+    #      rename = setName "teamspeak-headless-client-${ts3Version}";
+    #      inputs = { libpulseaudio = pkgs.libpulseaudio;
+    #                 qt5           = { base = teamspeakQt5; };
+    #                 freetype      = teamspeakQt5;
+    #                 xlibs         = { libxcb = teamspeakQt5; };
+    #                 xorg          = { libSM       = teamspeakQt5;
+    #                                   libICE      = teamspeakQt5;
+    #                                   libXrender  = teamspeakQt5;
+    #                                   libXrandr   = teamspeakQt5;
+    #                                   libXfixes   = teamspeakQt5;
+    #                                   libXcursor  = teamspeakQt5;
+    #                                   libXinerama = teamspeakQt5;
+    #                                   libXext     = teamspeakQt5;
+    #                                   libX11      = teamspeakQt5;
+    #                                 };
+    #               };
+    #
+    #  in rename ((ts3.override inputs).overrideDerivation (old: {
+    #    postInstall = ''
+    #        mv $out/bin/ts3client $out/bin/headless-teamspeak
+    #        mv $out/lib/teamspeak $out/lib/headless-teamspeak
+    #        rm $out/bin/.ts3client-wrapped
+    #        ln -s $out/lib/headless-teamspeak/ts3client \
+    #              $out/bin/.ts3client-wrapped
+    #        rm -rf $out/share
+    #    '';
+    #  }));
 
     wesnoth = pkgs.stdenv.lib.overrideDerivation pkgs.wesnoth (oldAttrs: {
       name = "wesnoth-1.12.2";
@@ -336,42 +334,47 @@
       };
     });
 
-    chromiumFixed =
-      let oldName = chromium.name;
-          version = (builtins.parseDrvName oldName).version;
-      in pkgs.stdenv.mkDerivation {
-        name = "chromium-fixed-${version}";
-        buildInputs = [ pkgs.makeWrapper ];
-        phases = "installPhase";
-        installPhase = ''
-            makeWrapper ${chromium}/bin/chromium $out/bin/chromium \
-              --set LD_PRELOAD ""
-            ln -sv $out/bin/chromium $out/bin/chromium-browser
-            ln -sv ${chromium}/share $out/share
-        '';
-     };
+    chromiumFixed = pkgs.stdenv.mkDerivation {
+      name = "chromium-fixed-${(builtins.parseDrvName chromium.name).version}";
+      buildInputs = [ pkgs.makeWrapper ];
+      phases = "installPhase";
+      installPhase = ''
+          makeWrapper ${chromium}/bin/chromium $out/bin/chromium \
+            --set LD_PRELOAD ""
+          ln -sv $out/bin/chromium $out/bin/chromium-browser
+          ln -sv ${chromium}/share $out/share
+      '';
+    };
 
     freetype = pkgs.freetype.override {
       useEncumberedCode = true;
     };
 
-    oraclejdk8 =
-    let jdkMajor = "8";
-        jdkMinor = "51";
-        jdkBuild = "16";
-        jdkSHA = "1wggrcr2gjwkv5bawgcw86h6rhyzw0jphxm1sfwcvhjirh99056p";
+    oraclejdk8_helpers = rec {
+      jdk = rec {
+        major = "8";
+        minor = "51";
+        build = "16";
+        sha256 = "1wggrcr2gjwkv5bawgcw86h6rhyzw0jphxm1sfwcvhjirh99056p";
+      };
 
-        jdkVersion = "${jdkMajor}u${jdkMinor}";
-        jdkBuildVersion = "${jdkVersion}-b${jdkBuild}";
-        jdkArch = if pkgs.stdenv.system == "x86_64-linux" then "x64" else "i586";
-        jdkURLPrefix = "http://download.oracle.com/otn-pub/java/jdk";
-        jdkURL = "${jdkURLPrefix}/${jdkBuildVersion}/jdk-${jdkVersion}-linux-${jdkArch}.tar.gz";
-        jdkSrc = pkgs.fetchurl {
-          url = jdkURL;
-          sha256 = jdkSHA;
-          curlOpts = "-b oraclelicense=a";
-        };
-    in pkgs.stdenv.lib.overrideDerivation pkgs.oraclejdk8 (oldAttrs: { src = jdkSrc; });
+      version = "${jdk.major}u${jdk.minor}";
+      buildVersion = "${version}-b${jdk.build}";
+      arch = if pkgs.stdenv.system == "x86_64-linux" then "x64" else "i586";
+      mirror = "http://download.oracle.com/otn-pub/java/jdk";
+      url = "${mirror}/${buildVersion}/jdk-${version}-linux-${arch}.tar.gz";
+
+      src = pkgs.fetchurl {
+        inherit url;
+        inherit (jdk) sha256;
+        curlOpts = "-b oraclelicense=a";
+      };
+
+      inherit (pkgs.stdenv.lib) overrideDerivation;
+    };
+
+    oraclejdk8 = (with oraclejdk8_helpers;
+      overrideDerivation pkgs.oraclejdk8 (oldAttrs: { inherit src; }));
 
     youtube-dl = pkgs.stdenv.lib.overrideDerivation pkgs.youtube-dl (oldAttrs: rec {
       name = "youtube-dl-${version}";
@@ -398,7 +401,10 @@
         url = "mirror://sourceforge/cmusphinx/${name}.tar.gz";
         sha256 = "0vr4k8pv5a8nvq9yja7kl13b5lh0f9vha8fc8znqnm8bwmcxnazp";
       };
-      nativeBuildInputs = old.nativeBuildInputs ++ [ pkgs.swig pkgs.python27 ];
+      nativeBuildInputs = pkgs.lib.concatLists [
+        old.nativeBuildInputs
+        [ pkgs.swig pkgs.python27 ]
+      ];
     });
 
     pocketsphinx = pkgs.pocketsphinx.overrideDerivation (old: rec {
@@ -407,9 +413,11 @@
         url = "mirror://sourceforge/cmusphinx/${name}.tar.gz";
         sha256 = "1n9yazzdgvpqgnfzsbl96ch9cirayh74jmpjf7svs4i7grabanzg";
       };
-      nativeBuildInputs = ([ sphinxbase pkgs.pkgconfig pkgs.swig pkgs.python27 ]
-                           ++ pkgs.gst_all_1.gstreamer.all
-                           ++ pkgs.gst_all_1.gst-plugins-base.all);
+      nativeBuildInputs = pkgs.lib.concatLists [
+        [ sphinxbase pkgs.pkgconfig pkgs.swig pkgs.python27 ]
+        pkgs.gst_all_1.gstreamer.all
+        pkgs.gst_all_1.gst-plugins-base.all
+      ];
       patches = [ ./pocketsphinx/fix-gstreamer-caps.patch ];
     });
 
@@ -430,46 +438,45 @@
 
     ocaml = pkgs.ocaml_4_02;
 
-#    liquidHaskell =
-#      let hsPkgs     = pkgs.haskellngPackages;
-#          runFind    = "${pkgs.findutils}/bin/find";
-#          ghcVersion = (builtins.parseDrvName hsPkgs.ghc.name).version;
-#      in buildEnv {
-#        name = "liquidHaskell";
-#        paths = [
-#          hsPkgs.liquidhaskell
-#          hsPkgs.liquid-fixpoint
-#        ];
-#        postBuild = ''
-#            rm -rf $out/bin
-#            mkdir -p $out/bin
-#            source ${pkgs.makeWrapper}/nix-support/setup-hook
-#            export GHC_ROOT="${haskell Pkgs}" # FIXME
-#            wrap () {
-#              makeWrapper "$1" "$2"                                    \
-#                --set NIX_GHC        "$GHC_ROOT/bin"                   \
-#                --set NIX_GHCPKG     "$GHC_ROOT/bin"                   \
-#                --set NIX_GHC_DOCDIR "$GHC_ROOT/share/doc/ghc/html"    \
-#                --set NIX_GHC_LIBDIR "$GHC_ROOT/lib/ghc-${ghcVersion}"
-#            }
-#            for i in "${hsPkgs.liquidhaskell} ${hsPkgs.liquid-fixpoint}"; do
-#              for j in "$(${runFind} $i/bin -executable -xtype f)"; do
-#                echo "Wrapping: $j"
-#                wrap "$j" $out/bin/$(basename "$j")
-#              done
-#            done
-#            exit -1
-#        '';
-#      };
+    #liquidHaskell =
+    #  let hsPkgs     = pkgs.haskellngPackages;
+    #      runFind    = "${pkgs.findutils}/bin/find";
+    #      ghcVersion = (builtins.parseDrvName hsPkgs.ghc.name).version;
+    #  in buildEnv {
+    #    name = "liquidHaskell";
+    #    paths = [
+    #      hsPkgs.liquidhaskell
+    #      hsPkgs.liquid-fixpoint
+    #    ];
+    #    postBuild = ''
+    #        rm -rf $out/bin
+    #        mkdir -p $out/bin
+    #        source ${pkgs.makeWrapper}/nix-support/setup-hook
+    #        export GHC_ROOT="${haskell Pkgs}" # FIXME
+    #        wrap () {
+    #          makeWrapper "$1" "$2"                                    \
+    #            --set NIX_GHC        "$GHC_ROOT/bin"                   \
+    #            --set NIX_GHCPKG     "$GHC_ROOT/bin"                   \
+    #            --set NIX_GHC_DOCDIR "$GHC_ROOT/share/doc/ghc/html"    \
+    #            --set NIX_GHC_LIBDIR "$GHC_ROOT/lib/ghc-${ghcVersion}"
+    #        }
+    #        for i in "${hsPkgs.liquidhaskell} ${hsPkgs.liquid-fixpoint}"; do
+    #          for j in "$(${runFind} $i/bin -executable -xtype f)"; do
+    #            echo "Wrapping: $j"
+    #            wrap "$j" $out/bin/$(basename "$j")
+    #          done
+    #        done
+    #        exit -1
+    #    '';
+    #  };
 
     #nginxWithRTMP = pkgs.nginx.override {
     #  modules = with pkgs.nginxModules; [ rtmp ];
     #};
 
-#                           *-----------------------*
-# --------------------------- Package set overrides ----------------------------
-#                           *-----------------------*
-
+#<#                          ┌───────────────────────┐
+#<# ─────────────────────────┤ Package set overrides ├──────────────────────────
+#<#                          └───────────────────────┘
 
     # haskellngPackages = pkgs.haskellngPackages.override {
     #   overrides = selff: superr: {
@@ -506,11 +513,11 @@
 
     myNodePackages = myNodePackages_4_x;
 
-    pythonPackagesGen = pp:
+    pythonPackagesGen = (pp:
       pkgs.callPackage ./pythonPackages {
         inherit pkgs;
         pythonPackages = pp;
-      };
+      });
 
     pypyPackages     = pythonPackagesGen pkgs.pypyPackages;
 
@@ -543,12 +550,12 @@
 
     ghcWith = (if hoogleEnabled then haskellPackages.ghcWithHoogle else haskellPackages.ghcWithPackages);
 
-    haskellEnv = { name, paths }:
+    haskellEnv = ({ name, paths }:
       pkgs.buildEnv {
         inherit name;
         paths = [ (ghcWith paths) ];
         ignoreCollisions = true;
-      };
+      });
 
     idrisPackages = pkgs.idrisPackages.override {
       overrides = self: super: {
@@ -611,11 +618,11 @@
       emacs = emacsHelpers.emacsGTK3;
     });
 
-    emacsEnv = { name, paths }:
+    emacsEnv = ({ name, paths }:
       pkgs.buildEnv {
         inherit name;
         paths = [ (emacsPackages.emacsWithPackages paths) ];
-      };
+      });
 
     overrideDeriv = pkgs.stdenv.lib.overrideDerivation;
 
@@ -634,18 +641,15 @@
 
     rapidcheck = pkgs.callPackage ./rapidcheck {};
 
+#<#                               ┌──────────────┐
+#<# ──────────────────────────────┤ Package sets ├──────────────────────────────
+#<#                               └──────────────┘
 
-#                                *--------------*
-# -------------------------------- Package sets --------------------------------
-#                                *--------------*
-
-
-#    templatePkgs = pkgs.buildEnv {
-#      name = "templatePkgs";
-#      paths = with pkgs; [
-#      ];
-#    };
-
+    #    templatePkgs = pkgs.buildEnv {
+    #      name = "templatePkgs";
+    #      paths = with pkgs; [
+    #      ];
+    #    };
 
     cliPkgs = buildEnv {
       name = "cliPkgs";
@@ -723,10 +727,10 @@
         cppcheck
         gdk_pixbuf
         gcc5
-#        gccgo
-#        gcj48
-#        ghdl
-#        gnat45
+        #        gccgo
+        #        gcj48
+        #        ghdl
+        #        gnat45
         glib
         glibcLocales
         gmpxx
