@@ -421,6 +421,17 @@
       patches = [ ./pocketsphinx/fix-gstreamer-caps.patch ];
     });
 
+    djvulibre_combined = pkgs.djvulibre.overrideDerivation (old: rec {
+      outputs = ["out"];
+    });
+
+    pdf2djvu = pkgs.pdf2djvu.overrideDerivation (old: rec {
+      nativeBuildInputs = pkgs.lib.concatLists [
+        (with pkgs; [pkgconfig poppler.dev poppler.out fontconfig libjpeg])
+        djvulibre_combined.all
+      ];
+    });
+
     #arcane-fixes = /home/remy/Documents/NotWork/Projects/C++/arcane-chat/fixes;
 
     #gst_all_1 = pkgs.recurseIntoAttrs (pkgs.callPackage "${arcane-fixes}/gstreamer" {});
