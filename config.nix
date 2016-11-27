@@ -312,7 +312,7 @@
     #    '';
     #  }));
 
-    wesnoth = pkgs.wesnoth.overrideDerivation (oldAttrs: {
+    wesnoth = pkgs.wesnoth.overrideDerivation (old: {
       name = "wesnoth-1.12.2";
       src = pkgs.fetchurl {
         url = "mirror://sourceforge/sourceforge/wesnoth/wesnoth-1.12.2.tar.bz2";
@@ -320,11 +320,11 @@
       };
     });
 
-    libcacaFull = pkgs.libcaca.overrideDerivation (oldAttrs: {
+    libcacaFull = pkgs.libcaca.overrideDerivation (old: {
       configureFlags = "";
     });
 
-    libtoxcore = pkgs.libtoxcore.overrideDerivation (oldAttrs: {
+    libtoxcore = pkgs.libtoxcore.overrideDerivation (old: {
       name = "tox-core-20150511";
       src = pkgs.fetchFromGitHub {
         owner  = "irungentoo";
@@ -374,9 +374,9 @@
     };
 
     oraclejdk8 = (with oraclejdk8_helpers;
-      overrideDerivation pkgs.oraclejdk8 (oldAttrs: { inherit src; }));
+      overrideDerivation pkgs.oraclejdk8 (old: { inherit src; }));
 
-    youtube-dl = pkgs.youtube-dl.overrideDerivation (oldAttrs: rec {
+    youtube-dl = pkgs.youtube-dl.overrideDerivation (old: rec {
       name = "youtube-dl-${version}";
       version = "2016.07.07";
       src = pkgs.fetchurl {
@@ -626,7 +626,7 @@
 
     overrideDeriv = pkgs.stdenv.lib.overrideDerivation;
 
-    # ideaCommunity = pkgs.idea.idea-community.overrideDerivation (oldAttrs: {
+    # ideaCommunity = pkgs.idea.idea-community.overrideDerivation (old: {
     #   name = "idea-community-15.0.1";
     #   src = pkgs.fetchurl {
     #     url = "https://download.jetbrains.com/idea/ideaIC-15.0.1.tar.gz";
