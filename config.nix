@@ -142,6 +142,8 @@
 
     miraclecast = pkgs.callPackage ./miraclecast {};
 
+    pdf2htmlEX = pkgs.callPackage ./pdf2htmlEX {};
+
     ceta = pkgs.callPackage ./ceta {};
 
     maude26 = pkgs.maude;
@@ -187,6 +189,43 @@
 
       buildInputs = old.buildInputs ++ (with pkgs; [automake autoconf libtool]);
     });
+
+    lib = pkgs.stdenv.lib // {
+      extra = {
+        # The sum of a list of numbers.
+        sum = lib.fold (x: y: x + y) 0;
+
+        # The product of a list of numbers.
+        product = lib.fold (x: y: x * y) 0;
+
+        # FIXME: doc
+        combineAttrs = lib.fold (x: y: x // y) {};
+
+        # FIXME: doc
+        takeString = (num: str:
+          (lib.concatStrings
+            (lib.take num
+              (lib.stringToCharacters str))));
+
+        # FIXME: doc
+        printList = (f: xs:
+          (with lib.strings // lib.debug;
+            traceSeq ("\n\n" + (concatStrings (map (x: (f x) + "\n") xs))) {}));
+
+        # Input list must be sorted
+        #fastUniquePresorted = (with lib; rec {
+        #  go = xs: if
+        #}).go;
+        # Same as fastUnique', except it sort
+        #fastUnique
+      };
+
+      unsafe = {
+        inherit (builtins) unsafeDiscardOutputDependency;
+        inherit (builtins) unsafeDiscardStringContext;
+        inherit (builtins) unsafeGetAttrPos;
+      };
+    };
 
     # https://github.com/jherico/OculusSDK.git
 
@@ -432,6 +471,8 @@
       ];
     });
 
+    ocrodjvu = python27Packages.ocrodjvu;
+
     #arcane-fixes = /home/remy/Documents/NotWork/Projects/C++/arcane-chat/fixes;
 
     #gst_all_1 = pkgs.recurseIntoAttrs (pkgs.callPackage "${arcane-fixes}/gstreamer" {});
@@ -537,9 +578,9 @@
     python34Packages = pythonPackagesGen pkgs.python34Packages;
     python35Packages = pythonPackagesGen pkgs.python35Packages;
 
-    python2Packages  = pkgs.python27Packages;
-    python3Packages  = pkgs.python34Packages;
-    pythonPackages   = pkgs.python27Packages;
+    python2Packages  = python27Packages;
+    python3Packages  = python34Packages;
+    pythonPackages   = python27Packages;
 
     pylint  = python2Packages.pylint;
     pylint3 = python3Packages.pylint;
@@ -1476,7 +1517,61 @@
       name = "texPkgs";
       paths = with pkgs; [
         (texlive.combine {
-          inherit (pkgs.texlive) scheme-full lm tipa;
+          inherit (texlive) collection-wintools;           # length: 1
+          inherit (texlive) collection-basic;              # length: 79
+          inherit (texlive) collection-texworks;           # length: 82
+          inherit (texlive) collection-langafrican;        # length: 93
+          inherit (texlive) collection-genericrecommended; # length: 99
+          inherit (texlive) collection-langportuguese;     # length: 103
+          inherit (texlive) collection-fontutils;          # length: 114
+          inherit (texlive) collection-formatsextra;       # length: 117
+          inherit (texlive) collection-langindic;          # length: 119
+          inherit (texlive) collection-langarabic;         # length: 120
+          inherit (texlive) collection-langitalian;        # length: 121
+          inherit (texlive) collection-langspanish;        # length: 123
+          inherit (texlive) collection-plainextra;         # length: 125
+          inherit (texlive) collection-langcjk;            # length: 128
+          inherit (texlive) collection-fontsrecommended;   # length: 145
+          inherit (texlive) collection-langgreek;          # length: 145
+          inherit (texlive) collection-langkorean;         # length: 158
+          inherit (texlive) collection-langfrench;         # length: 160
+          inherit (texlive) collection-langother;          # length: 165
+          inherit (texlive) collection-luatex;             # length: 170
+          inherit (texlive) collection-langchinese;        # length: 174
+          inherit (texlive) collection-latex;              # length: 176
+          inherit (texlive) collection-metapost;           # length: 182
+          inherit (texlive) collection-langgerman;         # length: 186
+          inherit (texlive) collection-genericextra;       # length: 191
+          inherit (texlive) collection-langenglish;        # length: 199
+          inherit (texlive) collection-xetex;              # length: 211
+          inherit (texlive) collection-music;              # length: 233
+          inherit (texlive) collection-games;              # length: 250
+          inherit (texlive) collection-binextra;           # length: 263
+          inherit (texlive) collection-omega;              # length: 285
+          inherit (texlive) collection-humanities;         # length: 305
+          inherit (texlive) collection-langczechslovak;    # length: 307
+          inherit (texlive) collection-langeuropean;       # length: 312
+          inherit (texlive) collection-langpolish;         # length: 318
+          inherit (texlive) collection-latexrecommended;   # length: 339
+          inherit (texlive) collection-science;            # length: 355
+          inherit (texlive) collection-langcyrillic;       # length: 399
+          inherit (texlive) collection-langjapanese;       # length: 401
+          inherit (texlive) collection-pstricks;           # length: 409
+          inherit (texlive) collection-bibtexextra;        # length: 418
+          inherit (texlive) collection-pictures;           # length: 435
+          inherit (texlive) collection-htmlxml;            # length: 453
+          inherit (texlive) collection-mathextra;          # length: 512
+          #nherit (texlive) collection-publishers;         # length: 584
+          #nherit (texlive) collection-fontsextra;         # length: 638
+          #nherit (texlive) collection-context;            # length: 1646
+          #nherit (texlive) collection-latexextra;         # length: 3620
+          #scheme-full = {
+          #  pkgs = map (x: lib.deepSeq x x) texlive.scheme-full.pkgs;
+          #};
+          #inherit (texlive) scheme-medium;
+          ## FIXME: figure out why (pkg.tlType == "doc") causes a stack overflow
+          pkgFilter = pkg: pkg.tlType == "run" || pkg.tlType == "bin" || pkg.tlType == "doc";
+          #pkgFilter = pkg: pkgs.lib.debug.traceSeq pkg.pname (pkg.tlType == "run" || pkg.tlType == "bin");
         })
         lmodern
         texinfoInteractive

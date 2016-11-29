@@ -11,7 +11,7 @@ let removeNulls = lib.filterAttrs (n: v: v != null);
       assert url != null;
       assert sha256 != null;
       pkgs.fetchurl (removeNulls { inherit url sha256 name curlOpts; });
-    
+
     mkPython =
       { packageName            # < A package name.
       , version                # < A package version.
@@ -33,7 +33,7 @@ let removeNulls = lib.filterAttrs (n: v: v != null);
       , platforms       ? null # < A list of supported platforms.
       , ... # Any other options will be passed to buildPythonPackage directly
       } @ args:
-      
+
       buildPythonPackage (removeNulls ({
         name = "${packageName}-${version}";
 
@@ -65,14 +65,14 @@ in pythonPackages // (rec {
   gst-gtklaunch = mkPython (rec {
     packageName = "gst-gtklaunch";
     version = "20160115";
-    
+
     src = pkgs.fetchFromGitHub {
       owner  = "UbiCastTeam";
       repo   = "gst-gtklaunch-1.0";
       rev    = "f53b1eb2a5ee089eef641d885103308411712f0e";
       sha256 = "1ik4n20splppq0zjgi3ixmab7vq9yy7m6cih08jw5bf334lnznvd";
     };
-                   
+
     propDeps = with pkgs; [
       gtk3
       pygobject3
@@ -91,10 +91,52 @@ in pythonPackages // (rec {
       "--prefix PATH : \"${pkgs.graphviz}/bin\""
       "--prefix PATH : \"${pkgs.python27Packages.xdot}/bin\""
     ];
-                   
+
     homepage     = "https://github.com/UbiCastTeam/gst-gtklaunch-1.0";
     description  = "A utility for testing GStreamer pipelines and elements";
     license      = with lib.licenses; [ lgpl21.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+  });
+
+  python-djvulibre = mkPython (rec {
+    packageName  = "python-djvulibre";
+    version      = "0.8";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "06zklmrjh8ci54pc1xqmsxyasivqzznwjj896g7fhh557wag6swx";
+    propDeps     = with pkgs; [ pkgconfig cython pkgs.djvulibre ];
+    homepage     = "https://jwilk.net/software/python-djvulibre";
+    description  = "Python bindings for libdjvulibre";
+    license      = with lib.licenses; [ gpl2.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+  });
+
+  PyICU = mkPython (rec {
+    packageName  = "PyICU";
+    version      = "1.9.5";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "16rmxy9y0qhqqna2v49i7nzwm09as699rbyvh4raw7w602w55c3k";
+    propDeps     = with pkgs; [ icu ];
+    homepage     = "https://github.com/ovalhub/pyicu";
+    description  = "Python bindings for the ICU library";
+    license      = with lib.licenses; [ mit.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+  });
+
+  ocrodjvu = mkPython (rec {
+    packageName  = "ocrodjvu";
+    version      = "0.10.1";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "1k6ha8x3abwdgqixlcn7a1hd6l7jmxxrc8w4bh06byfvgi61nkih";
+    propDeps     = with pkgs; [
+                     python-djvulibre PyICU lxml html5lib pillow nose
+                     libxml2 glibcLocales
+                   ];
+    homepage     = "https://jwilk.net/software/ocrodjvu";
+    description  = "A program that allows you to perform OCR on DjVu files";
+    license      = with lib.licenses; [ gpl2.spdxId ];
     maintainers  = with lib.maintainers; [ taktoa ];
     platforms    = with lib.platforms; all;
   });
@@ -111,7 +153,7 @@ in pythonPackages // (rec {
     maintainers  = with lib.maintainers; [ taktoa ];
     platforms    = with lib.platforms; all;
   });
-  
+
   mypy-lang = mkPython (rec {
     packageName  = "mypy-lang";
     version      = "0.4.1";
@@ -201,7 +243,7 @@ in pythonPackages // (rec {
     propDeps     = with pkgs; [ swig libpulseaudio pocketsphinx ];
     doCheck      = false;
   });
-  
+
   SpeechRecognition = mkPython (rec {
     packageName  = "SpeechRecognition";
     version      = "3.4.6";
@@ -212,7 +254,7 @@ in pythonPackages // (rec {
     description  = "Speech recognition library.";
     license      = with lib.licenses; [ bsd3.spdxId ];
     maintainers  = with lib.maintainers; [ taktoa ];
-    platforms    = with lib.platforms; all;    
+    platforms    = with lib.platforms; all;
     doCheck      = false;
   });
 })
