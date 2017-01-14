@@ -5,7 +5,7 @@
 , pkgconfig
 , glib
 , python
-, gnome
+, gnome3
 , alsaLib
 }:
 
@@ -20,7 +20,7 @@ stdenv.mkDerivation rec {
     pkgconfig
     glib
     python
-    gnome.gtk
+    gnome3.gtk
     alsaLib
   ];
 

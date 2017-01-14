@@ -1,12 +1,12 @@
 { stdenv, fetchFromGitHub
 , makeWrapper
-, gnome, xclip, scrot, imgur-screenshot
+, gnome3, xclip, scrot, imgur-screenshot
 , xdg_utils, gnused, curl
 }:
 
 with builtins;
 
-let zenity   = gnome.zenity;
+let zenity   = gnome3.zenity;
     xdg      = xdg_utils;
     joinMap  = show: sep: xs: concatStringsSep sep (map show xs);
     makePath = joinMap (p: "${p}/bin") ":";

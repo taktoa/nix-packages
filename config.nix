@@ -1,6 +1,5 @@
 { secret }:
 
-
 {
 
 
@@ -40,7 +39,7 @@
 #<#                            ┌───────────────────┐
 #<# ───────────────────────────┤ Personal packages ├────────────────────────────
 #<#                            └───────────────────┘
-
+    
     nixpkgs-manual = import <nixpkgs/doc>;
 
     bussard = pkgs.callPackage ./bussard {};
@@ -86,6 +85,8 @@
       paths = with pkgs; [ libg15 libg15render g15composer g15daemon g15macro ];
     };
 
+    teamspeak_client = pkgs.qt55.callPackage ./teamspeak/client.nix {};
+    
     fbset = pkgs.callPackage ./fbset {};
 
     languagetool = pkgs.callPackage ./languagetool {};
@@ -154,6 +155,10 @@
 
     yakyak = pkgs.callPackage ./yakyak {};
 
+    cpuchecker = pkgs.callPackage ./cpuchecker {};
+
+    journal-notify = pkgs.callPackage ./journal-notify {};
+
     hipspec = pkgs.haskellPackages.callPackage ./hipspec {};
 
     #lxqt = lxqt09;
@@ -189,6 +194,8 @@
 
       buildInputs = old.buildInputs ++ (with pkgs; [automake autoconf libtool]);
     });
+
+    steam = pkgs.steam.override { newStdcpp = true; };
 
     lib = pkgs.stdenv.lib // {
       extra = {
@@ -240,7 +247,7 @@
     # for some reason chromium ends up building from source
     chromium = (import <nixpkgs> { config.packageOverrides = pkgs: {}; }).chromium.override {
       enablePepperFlash = true;
-      enableWideVine    = true;
+    #  enableWideVine    = true;
     };
 
     slimlock = pkgs.runCommand "slimlock" {} ''
@@ -417,10 +424,10 @@
 
     youtube-dl = pkgs.youtube-dl.overrideDerivation (old: rec {
       name = "youtube-dl-${version}";
-      version = "2016.07.07";
+      version = "2016.12.09";
       src = pkgs.fetchurl {
         url = "http://youtube-dl.org/downloads/${version}/${name}.tar.gz";
-        sha256 = "0bwlqvqiisqc2jlm2jmqgdp1x8bbz7p791hqxqrh45003zdhh84y";
+        sha256 = "0js9825nzdnny3mpjfnmy6267qnas92f0hv6icsz1rr8si4knjgm";
       };
     });
 
@@ -471,7 +478,18 @@
       ];
     });
 
-    ocrodjvu = python27Packages.ocrodjvu;
+    cvsps = pkgs.cvsps.overrideDerivation (old: rec {
+      name = "cvsps-20060617";
+      src = pkgs.fetchFromGitHub {
+        owner  = "andreyvit";
+        repo   = "cvsps";
+        rev    = "33357c6940d204acac23d9e7ae369d071ce61a01";
+        sha256 = "1mcnzr8xf0gvkk9nq64sp17m66z4ywcskb10sb0mr03mmg4fs5c8";
+      };
+      patches = [];
+    });
+
+    inherit (python27Packages) ocrodjvu csvkit gst-gtklaunch;
 
     #arcane-fixes = /home/remy/Documents/NotWork/Projects/C++/arcane-chat/fixes;
 
@@ -585,6 +603,13 @@
     pylint  = python2Packages.pylint;
     pylint3 = python3Packages.pylint;
 
+    pythonEnv = { name, paths }: buildEnv {
+      inherit name;
+      paths = [
+        (python35Packages.python.withPackages paths)
+      ];
+    };
+
     haskellPackages = pkgs.callPackage ./haskellPackages {
       inherit pkgs;
       inherit (pkgs) haskellPackages;
@@ -693,6 +718,19 @@
 
     rapidcheck = pkgs.callPackage ./rapidcheck {};
 
+    gstreamer1 = buildEnv {
+      name = "gstreamer1";
+      paths = pkgs.lib.concatLists [
+        pkgs.gst_all_1.gstreamer.all
+        pkgs.gst_all_1.gstreamermm.all
+        pkgs.gst_all_1.gst-libav.all
+        pkgs.gst_all_1.gst-plugins-base.all 
+        pkgs.gst_all_1.gst-plugins-good.all 
+        pkgs.gst_all_1.gst-plugins-ugly.all 
+        pkgs.gst_all_1.gst-plugins-bad.all
+      ];
+    };
+    
 #<#                               ┌──────────────┐
 #<# ──────────────────────────────┤ Package sets ├──────────────────────────────
 #<#                               └──────────────┘
@@ -710,6 +748,7 @@
         bashInteractive
         bashCompletion
         cdrkit
+        csvkit
         cscope
         cv
         docbook2x
@@ -722,9 +761,11 @@
         gnupg21
         gnuplot
         graphviz
+        gstreamer1
         htop
         hwloc
         impressive
+        iperf3
         jq
         jsonnet
         kbd
@@ -842,14 +883,18 @@
         arandr
         bustle
         conkeror
+        deluge
         dmenu
         evince
         fbreader
         filezilla
         firefox
         gnome3.seahorse
+        gnumeric
         gsettings_desktop_schemas
+        gst-gtklaunch
         quassel
+        libreoffice
         lxappearance
         paprefs
         pavucontrol
@@ -955,12 +1000,13 @@
         #~shake-minify   #: Shake rules for source minification
 
         # Development
-        haddocset    #: Generate Dash/Zeal docsets from Haddock documentation
-        haskell-docs #: Documentation browser
-        intero       #: Improved version of ghci
-        haddock-api  #: The Haddock API
-        ghc          #: GHC API
-        ghc.doc      #: GHC documentation
+        haddocset         #: Generate Dash/Zeal docsets from Haddock docs
+        haskell-docs      #: Documentation browser
+        intero            #: Improved version of ghci
+        haddock-api       #: The Haddock API
+        ghc               #: GHC API
+        ghc.doc           #: GHC documentation
+        purescript-native #: Purescript compiler
 
         # Pandoc
         pandoc          #: Convert text files easily
@@ -1012,6 +1058,8 @@
         data-memocombinators #: Combinators for memoization
         here                 #: String interpolation
         turtle               #: Write scripts in Haskell
+        shelly               #: Use Haskell as a scripting language
+        shelly-extra         #: Extra stuff for shelly
         shake                #: Haskell build system
         uuid                 #: UUIDs for Haskell
         derive               #: Tools for deriving instances in Haskell
@@ -1022,6 +1070,7 @@
         ### System IO
         path           #: A type-safe file path abstraction
         path-io        #: An interface to `directory` using types from `path`
+        hpath          #: Another type-safe path library
         process        #: Launch processes from Haskell
         HFuse          #: Bindings for FUSE in Haskell
         hit            #: Tools for interacting with the git store
@@ -1029,6 +1078,8 @@
         gitlib-libgit2 #: The libgit2 backend to gitlib
         filestore      #: A high-level interface to multiple versioning file stores
         mmap           #: Gives access to the mmap syscall
+        #~libzfs       #: Bindings to the ZFS API
+        btrfs          #: Bindings to the btrfs API
 
         ### Dates and times
         time    #: Time manipulation
@@ -1041,10 +1092,12 @@
         text          #: Packed unicode strings
         text-icu      #: Unicode functions for Data.Text
         #~hyphenation #: Hyphenate / line-break text
+        unicode-show  #: Show text with unescaped Unicode characters
 
         ### General text processing
         pcre-heavy  #: Usable version of pcre-light
         regex-tdfa  #: Regular expressions through tagged DFAs
+        regex-pcre  #: PCRE regular expressions
         #~peggy     #: PEG grammars
         parsers     #: Generate parsers from a single definition
         trifecta    #: A user-friendly and effective parser library
@@ -1121,6 +1174,7 @@
         ascii-progress       #: An ASCII progress bar
         optparse-applicative #: CLI option parsers
         configurator         #: Configuration
+        docopt               #: Declarative CLI option parser language
 
         ### Exceptions
         exceptions          #: Extensible optionally-pure exceptions
@@ -1469,26 +1523,23 @@
       passthru = { meta = { priority = 0; }; };
     };
 
-    pythonPkgs = buildEnv {
+    pythonPkgs = pythonEnv {
       name = "pythonPkgs";
-      paths = [
-        python27Packages.deluge
-        python27Packages.csvkit
-        python27Packages.gst-gtklaunch
-
-        python35Packages.python
-        python35Packages.fonttools
-        python35Packages.ipython
-        python35Packages.matplotlib
-        python35Packages.scipy
-        python35Packages.numpy
-        python35Packages.pygments
-        python35Packages.pygobject
-        python35Packages.ptpython
-        python35Packages.jsonpatch
-        python35Packages.pep8
-        python35Packages.flake8
-        python35Packages.autopep8
+      paths = ps: [
+        ps.python
+        ps.fonttools
+        ps.ipython
+        ps.matplotlib
+        ps.scipy
+        ps.numpy
+        ps.pygments
+        ps.pygobject
+        ps.ptpython
+        ps.jsonpatch
+        ps.pep8
+        ps.flake8
+        ps.autopep8
+        ps.beautifulsoup4
       ];
     };
 
@@ -1517,60 +1568,60 @@
       name = "texPkgs";
       paths = with pkgs; [
         (texlive.combine {
-          inherit (texlive) collection-wintools;           # length: 1
-          inherit (texlive) collection-basic;              # length: 79
-          inherit (texlive) collection-texworks;           # length: 82
-          inherit (texlive) collection-langafrican;        # length: 93
-          inherit (texlive) collection-genericrecommended; # length: 99
-          inherit (texlive) collection-langportuguese;     # length: 103
-          inherit (texlive) collection-fontutils;          # length: 114
-          inherit (texlive) collection-formatsextra;       # length: 117
-          inherit (texlive) collection-langindic;          # length: 119
-          inherit (texlive) collection-langarabic;         # length: 120
-          inherit (texlive) collection-langitalian;        # length: 121
-          inherit (texlive) collection-langspanish;        # length: 123
-          inherit (texlive) collection-plainextra;         # length: 125
-          inherit (texlive) collection-langcjk;            # length: 128
-          inherit (texlive) collection-fontsrecommended;   # length: 145
-          inherit (texlive) collection-langgreek;          # length: 145
-          inherit (texlive) collection-langkorean;         # length: 158
-          inherit (texlive) collection-langfrench;         # length: 160
-          inherit (texlive) collection-langother;          # length: 165
-          inherit (texlive) collection-luatex;             # length: 170
-          inherit (texlive) collection-langchinese;        # length: 174
-          inherit (texlive) collection-latex;              # length: 176
-          inherit (texlive) collection-metapost;           # length: 182
-          inherit (texlive) collection-langgerman;         # length: 186
-          inherit (texlive) collection-genericextra;       # length: 191
-          inherit (texlive) collection-langenglish;        # length: 199
-          inherit (texlive) collection-xetex;              # length: 211
-          inherit (texlive) collection-music;              # length: 233
-          inherit (texlive) collection-games;              # length: 250
-          inherit (texlive) collection-binextra;           # length: 263
-          inherit (texlive) collection-omega;              # length: 285
-          inherit (texlive) collection-humanities;         # length: 305
-          inherit (texlive) collection-langczechslovak;    # length: 307
-          inherit (texlive) collection-langeuropean;       # length: 312
-          inherit (texlive) collection-langpolish;         # length: 318
-          inherit (texlive) collection-latexrecommended;   # length: 339
-          inherit (texlive) collection-science;            # length: 355
-          inherit (texlive) collection-langcyrillic;       # length: 399
-          inherit (texlive) collection-langjapanese;       # length: 401
-          inherit (texlive) collection-pstricks;           # length: 409
-          inherit (texlive) collection-bibtexextra;        # length: 418
-          inherit (texlive) collection-pictures;           # length: 435
-          inherit (texlive) collection-htmlxml;            # length: 453
-          inherit (texlive) collection-mathextra;          # length: 512
-          #nherit (texlive) collection-publishers;         # length: 584
-          #nherit (texlive) collection-fontsextra;         # length: 638
-          #nherit (texlive) collection-context;            # length: 1646
-          #nherit (texlive) collection-latexextra;         # length: 3620
+          # inherit (texlive) collection-wintools;           # length: 1
+          # inherit (texlive) collection-basic;              # length: 79
+          # inherit (texlive) collection-texworks;           # length: 82
+          # #inherit (texlive) collection-langafrican;       # length: 93
+          # inherit (texlive) collection-genericrecommended; # length: 99
+          # #inherit (texlive) collection-langportuguese;    # length: 103
+          # inherit (texlive) collection-fontutils;          # length: 114
+          # inherit (texlive) collection-formatsextra;       # length: 117
+          # #inherit (texlive) collection-langindic;         # length: 119
+          # #inherit (texlive) collection-langarabic;        # length: 120
+          # inherit (texlive) collection-langitalian;        # length: 121
+          # inherit (texlive) collection-langspanish;        # length: 123
+          # inherit (texlive) collection-plainextra;         # length: 125
+          # #inherit (texlive) collection-langcjk;           # length: 128
+          # inherit (texlive) collection-fontsrecommended;   # length: 145
+          # inherit (texlive) collection-langgreek;          # length: 145
+          # inherit (texlive) collection-langkorean;         # length: 158
+          # #inherit (texlive) collection-langfrench;        # length: 160
+          # inherit (texlive) collection-langother;          # length: 165
+          # inherit (texlive) collection-luatex;             # length: 170
+          # #inherit (texlive) collection-langchinese;       # length: 174
+          # inherit (texlive) collection-latex;              # length: 176
+          # inherit (texlive) collection-metapost;           # length: 182
+          # #inherit (texlive) collection-langgerman;        # length: 186
+          # inherit (texlive) collection-genericextra;       # length: 191
+          # inherit (texlive) collection-langenglish;        # length: 199
+          # inherit (texlive) collection-xetex;              # length: 211
+          # inherit (texlive) collection-music;              # length: 233
+          # #inherit (texlive) collection-games;             # length: 250
+          # #inherit (texlive) collection-binextra;          # length: 263
+          # #inherit (texlive) collection-omega;             # length: 285
+          # #inherit (texlive) collection-humanities;        # length: 305
+          # #inherit (texlive) collection-langczechslovak;   # length: 307
+          # #inherit (texlive) collection-langeuropean;      # length: 312
+          # #inherit (texlive) collection-langpolish;        # length: 318
+          # #inherit (texlive) collection-latexrecommended;  # length: 339
+          # #inherit (texlive) collection-science;           # length: 355
+          # #inherit (texlive) collection-langcyrillic;      # length: 399
+          # #inherit (texlive) collection-langjapanese;      # length: 401
+          # #inherit (texlive) collection-pstricks;          # length: 409
+          # #inherit (texlive) collection-bibtexextra;       # length: 418
+          # #inherit (texlive) collection-pictures;          # length: 435
+          # #inherit (texlive) collection-htmlxml;           # length: 453
+          # #inherit (texlive) collection-mathextra;         # length: 512
+          # #inherit (texlive) collection-publishers;        # length: 584
+          # inherit (texlive) collection-fontsextra;         # length: 638
+          # #inherit (texlive) collection-context;           # length: 1646
+          # inherit (texlive) collection-latexextra;         # length: 3620
           #scheme-full = {
           #  pkgs = map (x: lib.deepSeq x x) texlive.scheme-full.pkgs;
           #};
-          #inherit (texlive) scheme-medium;
+          inherit (texlive) scheme-full;
           ## FIXME: figure out why (pkg.tlType == "doc") causes a stack overflow
-          pkgFilter = pkg: pkg.tlType == "run" || pkg.tlType == "bin" || pkg.tlType == "doc";
+          #pkgFilter = pkg: pkg.tlType == "run" || pkg.tlType == "bin" || pkg.tlType == "doc";
           #pkgFilter = pkg: pkgs.lib.debug.traceSeq pkg.pname (pkg.tlType == "run" || pkg.tlType == "bin");
         })
         lmodern
@@ -1585,11 +1636,23 @@
       paths = with pkgs; [
         bazaar
         cvs
+        cvsps
+        cvs2svn
+        cvs_fast_export
         git-lfs
         gitFull
         git-credential-gnome-keyring
         mercurial
         subversion
+      ];
+    };
+
+    # This package set should be installed with
+    #     `nix-env -iA unstable.unstablePkgs`
+    # (assuming that you have a nixpkgs unstable channel called "unstable")
+    unstablePkgs = buildEnv {
+      name = "unstablePkgs";
+      paths = with pkgs; [
       ];
     };
 

@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, alsaLib, alsaOss, gnome, pkgconfig, libpulseaudio }:
+{ stdenv, fetchurl, alsaLib, alsaOss, gnome3, pkgconfig, libpulseaudio }:
 
 stdenv.mkDerivation rec {
   pkgName = "gtick";
@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
   };
 
   buildInputs = [
-    gnome.gtk
+    gnome3.gtk
     alsaLib
     alsaOss
     pkgconfig

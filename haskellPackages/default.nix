@@ -35,6 +35,8 @@ in haskellPackages.override {
       isExecutable = false;
     });
     binary-serialise-cbor = self.callPackage ./binary-serialise-cbor.nix {};
+    language-javascript = self.callPackage ./language-javascript.nix {};
+    purescript-native = dontCheck (self.callPackage ./purescript-native.nix {});
     llvm-general-pure = self.callPackage ./llvm-general/llvm-general-pure.nix {};
     synthesizer-core = dontCheck super.synthesizer-core;
     hnix = dontCheck super.hnix;
@@ -56,6 +58,7 @@ in haskellPackages.override {
     clash-verilog = mkClashLib super.clash-verilog "clash-verilog";
     clash-systemverilog = mkClashLib super.clash-systemverilog "clash-systemverilog";
     term-rewriting = dontCheck super.term-rewriting;
+    # idris = self.callPackage ./idris.nix {};
   };
 }
 
