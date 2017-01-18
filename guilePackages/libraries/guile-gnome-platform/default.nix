@@ -1,35 +1,29 @@
-{ fetchgit, stdenv, guile, guile_lib, gwrap
-, pkgconfig, gnome3, gnome, glib, gtk
-, pango, guileCairo, autoconf, automake
-, texinfo
+{ fetchgit, stdenv                       # Nix functions
+, autoconf, automake, pkgconfig, texinfo # Build tools
+, guile, guile_lib, gwrap, guileCairo    # Guile libraries
+, gnome3, gnome, glib, gtk, pango        # Other libraries
 }:
 
 stdenv.mkDerivation rec {
-  name = "guile-gnome-platform-2.16.3";
-  
+  name = "guile-gnome-platform-${version}";
+  version = "2.16.3";
+
   src = fetchgit {
-    url = "git://git.sv.gnu.org/guile-gnome.git";
-    rev = "3e91b29cf8f0d8af4eba23f8133f47f21cf3526a";
+    url    = "git://git.sv.gnu.org/guile-gnome.git";
+    rev    = "3e91b29cf8f0d8af4eba23f8133f47f21cf3526a";
     sha256 = "1gbfa7gsr7blka3hcnq95wgj4fcmgjbvmfgxpcrzrfmil2f0c5z5";
   };
-  
+
   buildInputs = [
-    autoconf
-    automake
-    texinfo
-    guile
-    gwrap
-    pkgconfig
+    autoconf automake texinfo pkgconfig
+    guile guileCairo gwrap
+    glib gtk pango
     gnome3.gconf
-    glib
     gnome.gnome_vfs
-    gtk
     gnome.libglade
     gnome.libgnome
     gnome.libgnomecanvas
     gnome.libgnomeui
-    pango
-    guileCairo
   ] ++ stdenv.lib.optional doCheck guile_lib;
 
   preConfigure = ''
@@ -42,20 +36,10 @@ stdenv.mkDerivation rec {
   doCheck = false;
 
   meta = {
+    inherit name version;
     description = "GNOME bindings for GNU Guile";
-
-    longDescription =
-      '' GNU guile-gnome brings the power of Scheme to your graphical
-         application.  guile-gnome modules support the entire Gnome library
-         stack: from Pango to GnomeCanvas, Gtk+ to GStreamer, Glade to
-         GtkSourceView, you will find in guile-gnome a comprehensive
-         environment for developing modern applications.
-      '';
-
-    homepage = http://www.gnu.org/software/guile-gnome/;
-
-    license = stdenv.lib.licenses.gpl2Plus;
-
-    maintainers = [ stdenv.lib.maintainers.taktoa ];
+    homepage    = "http://www.gnu.org/software/guile-gnome";
+    license     = licenses.gpl2Plus;
+    maintainers = with maintainers; [ taktoa ];
   };
 }

@@ -10,7 +10,5 @@ in stdenv.mkDerivation rec {
       cp -R ${slibGuile}/lib/slib $out/share/guile/site/2.0
   '';
 
-  meta = {
-    
-  };
+  meta = {};
 };

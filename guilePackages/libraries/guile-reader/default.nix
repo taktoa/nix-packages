@@ -1,7 +1,8 @@
 { fetchurl, stdenv, pkgconfig, autoconf, automake, guile, gperf }:
 
 stdenv.mkDerivation rec {
-  name = "guile-reader-0.6.1";
+  name = "guile-reader-${version}";
+  version = "0.6.1";
 
   src = fetchurl {
     url    = "mirror://savannah/guile-reader/${name}.tar.gz";
@@ -9,25 +10,21 @@ stdenv.mkDerivation rec {
   };
 
   buildInputs = [
-    autoconf
-    automake
-    pkgconfig
-    guile
-    gperf
+    autoconf automake pkgconfig
+    guile gperf
   ];
 
   postInstall = ''
-      mkdir -p $out/share/guile/site/
-      mv $out/share/guile-reader $out/share/guile/site/2.0
+      mkdir -p "$out/share/guile/site/"
+      mv "$out/share/guile-reader" "$out/share/guile/site/2.0"
   '';
-  
-  meta = {
-    description = ''
-        Guile-Reader is a simple framework for building readers for GNU Guile.
-    '';
-    homepage = http://www.nongnu.org/guile-reader;
-    license = stdenv.lib.licenses.gpl3Plus;
-    meta.platforms = stdenv.lib.platforms.linux;
-    maintainers = [ stdenv.lib.maintainers.taktoa ];
+
+  meta = with stdenv.lib; {
+    inherit name version;
+    description = "Guile-Reader: a framework for building readers for Guile."
+    homepage    = "http://www.nongnu.org/guile-reader";
+    license     = licenses.gpl3Plus;
+    platforms   = platforms.linux;
+    maintainers = with maintainers; [ taktoa ];
   };
 }
