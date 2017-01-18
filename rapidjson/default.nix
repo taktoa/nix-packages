@@ -1,12 +1,13 @@
 { stdenv, fetchFromGitHub, cmake }:
 
 stdenv.mkDerivation rec {
-  name = "rapidjson-1.0.2";
+  name = "rapidjson-${version}";
+  version = "1.0.2";
 
   src = fetchFromGitHub {
-    owner = "miloyip";
-    repo = "rapidjson";
-    rev = "3d5848a7cd3367c5cb451c6493165b7745948308";
+    owner  = "miloyip";
+    repo   = "rapidjson";
+    rev    = "v${version}";
     sha256 = "01gh5d1v8rbrcl4jdksllnpfbkmc9994yr4l3ki0f87353cy872i";
   };
 
@@ -15,10 +16,11 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   meta = with stdenv.lib; {
+    inherit name version;
     description = "A fast JSON parser/pretty-printer for C++";
-    homepage = http://rapidjson.org;
-    license = licenses.mit;
-    meta.platforms = platforms.linux;
+    homepage    = http://rapidjson.org;
+    license     = licenses.mit;
+    platforms   = platforms.linux;
     maintainers = with maintainers; [ taktoa ];
   };
 }

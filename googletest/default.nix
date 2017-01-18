@@ -1,12 +1,13 @@
 { stdenv, fetchFromGitHub, cmake, python }:
 
 stdenv.mkDerivation rec {
-  name = "googletest-1.7.0";
+  name = "googletest-${version}";
+  version = "1.7.0";
 
   src = fetchFromGitHub {
-    owner = "google";
-    repo = "googletest";
-    rev = "c99458533a9b4c743ed51537e25989ea55944908";
+    owner  = "google";
+    repo   = "googletest";
+    rev    = "release-${version}";
     sha256 = "1yqnzrr7bgnnnwq02c5gy559mmb52pap7m1h7zd6w58dj9yvg72n";
   };
 
@@ -28,7 +29,7 @@ stdenv.mkDerivation rec {
   checkPhase = ''
       make test
   '';
-  
+
   # checkPhase = ''
   #     runTest () {
   #       echo "Running test: $1"
@@ -96,10 +97,11 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   meta = with stdenv.lib; {
+    inherit name version;
     description = "The Google C++ Testing Framework";
     homepage = https://github.com/google/googletest;
     license = licenses.bsd3;
-    meta.platforms = platforms.all;
+    platforms = platforms.all;
     maintainers = with maintainers; [ taktoa ];
   };
 }
