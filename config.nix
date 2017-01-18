@@ -46,6 +46,8 @@
 
     bustle = pkgs.callPackage ./bustle {};
 
+    docopt-cpp = pkgs.callPackage ./docopt-cpp {};
+
     getVersion = k: (builtins.parseDrvName k.name).version;
 
     utility = pkgs.callPackage ./utility {};
@@ -250,10 +252,13 @@
     #  enableWideVine    = true;
     };
 
-    slimlock = pkgs.runCommand "slimlock" {} ''
-        mkdir -p $out/bin
-        ln -s ${pkgs.slim}/bin/slimlock $out/bin/slimlock
-        ln -s ${pkgs.slim}/bin/slimlock $out/bin/xflock4
+    i3lock-dpms = pkgs.writeScriptBin "slock" ''
+        #!/usr/bin/env bash
+        revert() { xset dpms 0 0 0; }
+        trap revert SIGHUP SIGINT SIGTERM
+        xset +dpms dpms 5 5 5
+        ${pkgs.i3lock}/bin/i3lock -n -c000000
+        revert
     '';
 
     #qt5Override = pkgs.qt5.base.overrideDerivation;
@@ -377,6 +382,18 @@
         repo   = "toxcore";
         rev    = "b2350f2e26e4fd2c1e9627680663170d94b6d0b8";
         sha256 = "13pq4vnmgbny4yfsgn2sqybmgwyvakrabsnp89k9whnp5c8jp4q9";
+      };
+    });
+
+    aria = aria2;
+    aria2 = pkgs.aria2.overrideDerivation (old: rec {
+      name = "aria2-${version}";
+      version = "1.30.0";
+      src = pkgs.fetchFromGitHub {
+        owner = "aria2";
+        repo = "aria2";
+        rev = "release-${version}";
+        sha256 = "0zm5qnxqafa3ssk48a1iaf8ydwf8r42dd9b09kkyyp9x03yi4xm5";
       };
     });
 
@@ -612,7 +629,7 @@
 
     haskellPackages = pkgs.callPackage ./haskellPackages {
       inherit pkgs;
-      inherit (pkgs) haskellPackages;
+      haskellPackages = pkgs.haskellPackages;
     };
 
     profiledHaskellPackages = pkgs.haskellPackages.override {
@@ -623,7 +640,7 @@
       };
     };
 
-    hoogleEnabled = true;
+    hoogleEnabled = false;
 
     ghcWith = (if hoogleEnabled then haskellPackages.ghcWithHoogle else haskellPackages.ghcWithPackages);
 
@@ -788,7 +805,8 @@
         rtags
         screen
         screenfetch
-        slimlock
+        i3lock
+        i3lock-dpms
         sloccount
         smartmontools
         socat
@@ -1143,6 +1161,7 @@
         blaze-html     #: HTML combinators for Haskell
         css-text       #: Parse/render CSS
         email-validate #: Parse/render email addresses
+        github         #: Bindings to the GitHub API
 
         ### Language processing
         haskell-src             #: Parse/render Haskell
@@ -1169,7 +1188,7 @@
 
         ### Command-line interfaces
         brick                #: Terminal application UI
-        vty                  #: Virtual terminal library
+        vty_5_14             #: Virtual terminal library
         concurrent-output    #: Concurrent terminal output
         ascii-progress       #: An ASCII progress bar
         optparse-applicative #: CLI option parsers
@@ -1266,6 +1285,9 @@
         clash-vhdl          #: VHDL backend for Clash
         clash-verilog       #: Verilog backend for Clash
         clash-systemverilog #: SystemVerilog backend for Clash
+
+        ### Game Engine
+        helm #: FRP game engine
 
         ### Compression
         lz4    #: The LZ4 compression format
