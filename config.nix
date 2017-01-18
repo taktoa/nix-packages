@@ -39,7 +39,7 @@
 #<#                            ┌───────────────────┐
 #<# ───────────────────────────┤ Personal packages ├────────────────────────────
 #<#                            └───────────────────┘
-    
+
     nixpkgs-manual = import <nixpkgs/doc>;
 
     bussard = pkgs.callPackage ./bussard {};
@@ -88,7 +88,7 @@
     };
 
     teamspeak_client = pkgs.qt55.callPackage ./teamspeak/client.nix {};
-    
+
     fbset = pkgs.callPackage ./fbset {};
 
     languagetool = pkgs.callPackage ./languagetool {};
@@ -741,13 +741,13 @@
         pkgs.gst_all_1.gstreamer.all
         pkgs.gst_all_1.gstreamermm.all
         pkgs.gst_all_1.gst-libav.all
-        pkgs.gst_all_1.gst-plugins-base.all 
-        pkgs.gst_all_1.gst-plugins-good.all 
-        pkgs.gst_all_1.gst-plugins-ugly.all 
+        pkgs.gst_all_1.gst-plugins-base.all
+        pkgs.gst_all_1.gst-plugins-good.all
+        pkgs.gst_all_1.gst-plugins-ugly.all
         pkgs.gst_all_1.gst-plugins-bad.all
       ];
     };
-    
+
 #<#                               ┌──────────────┐
 #<# ──────────────────────────────┤ Package sets ├──────────────────────────────
 #<#                               └──────────────┘
