@@ -48,6 +48,8 @@
 
     docopt-cpp = pkgs.callPackage ./docopt-cpp {};
 
+    dparser = pkgs.callPackage ./dparser {};
+
     getVersion = k: (builtins.parseDrvName k.name).version;
 
     utility = pkgs.callPackage ./utility {};
