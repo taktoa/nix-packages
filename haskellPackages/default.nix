@@ -44,8 +44,8 @@ in haskellPackages.override {
     s-cargot = dontCheck super.s-cargot;
     friday-juicypixels = dontCheck super.friday-juicypixels;
     mighttpd2 = super.mighttpd2.overrideScope (self: super: {
-      http-client = super.http-client_0_5_3_3;
-      http-client-tls = super.http-client-tls_0_3_3;
+      http-client = super.http-client_0_5_5;
+      http-client-tls = super.http-client-tls_0_3_3_1;
       http-conduit = super.http-conduit_2_2_3;
     });
     aeson-diff = dontCheck super.aeson-diff;
