@@ -1,4 +1,4 @@
-{ stdenv, fetchFromGitHub, pkgs }:
+{ stdenv, fetchFromGitHub, cmake }:
 
 stdenv.mkDerivation rec {
   name = "docopt-cpp-${version}";
@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
     sha256 = "1rgkc8nsc2zz2lkyai0y68vrd6i6kbq63hm3vdza7ab6ghq0n1dd";
   };
 
-  buildInputs = with pkgs; [ cmake ];
+  buildInputs = [ cmake ];
 
   meta = with stdenv.lib; {
     inherit name version;
