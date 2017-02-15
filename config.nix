@@ -107,7 +107,7 @@
 
     powerline-fonts = pkgs.callPackage ./powerline-fonts {};
 
-    # maven = pkgs.callPackage ./maven {}
+    maven = pkgs.callPackage ./maven {};
 
     rust-bindgen = pkgs.callPackage ./rust-bindgen {};
 
@@ -147,7 +147,7 @@
 
     miraclecast = pkgs.callPackage ./miraclecast {};
 
-    pdf2htmlEX = pkgs.callPackage ./pdf2htmlEX {};
+    # pdf2htmlEX = pkgs.callPackage ./pdf2htmlEX {};
 
     ceta = pkgs.callPackage ./ceta {};
 
@@ -251,7 +251,7 @@
     # for some reason chromium ends up building from source
     chromium = (import <nixpkgs> { config.packageOverrides = pkgs: {}; }).chromium.override {
       enablePepperFlash = true;
-    #  enableWideVine    = true;
+      enableWideVine    = true;
     };
 
     i3lock-dpms = pkgs.writeScriptBin "slock" ''
@@ -443,10 +443,10 @@
 
     youtube-dl = pkgs.youtube-dl.overrideDerivation (old: rec {
       name = "youtube-dl-${version}";
-      version = "2016.12.09";
+      version = "2017.02.14";
       src = pkgs.fetchurl {
         url = "http://youtube-dl.org/downloads/${version}/${name}.tar.gz";
-        sha256 = "0js9825nzdnny3mpjfnmy6267qnas92f0hv6icsz1rr8si4knjgm";
+        sha256 = "1qcsixjysqrwx50xmv0mz3m5xd8i0rc2l5fnj5pl300r9j22kpkz";
       };
     });
 
@@ -642,7 +642,7 @@
       };
     };
 
-    hoogleEnabled = false;
+    hoogleEnabled = true;
 
     ghcWith = (if hoogleEnabled then haskellPackages.ghcWithHoogle else haskellPackages.ghcWithPackages);
 
@@ -905,6 +905,7 @@
         conkeror
         deluge
         dmenu
+        eagle
         evince
         fbreader
         filezilla
@@ -925,7 +926,7 @@
         unetbootin
         weston
         wpa_supplicant_gui
-        yakyak
+        # yakyak
         zeal
       ];
     };
@@ -959,7 +960,8 @@
       name = "haskellProgPkgs";
       paths = with pkgs; with haskellPackages; [
         ### Build systems
-        hi #: Project template system
+        hi    #: Project template system
+        stack #: Wrapper around Cabal
 
         ### Runtime inspection
         threadscope #: Haskell graphical profiler
@@ -971,6 +973,7 @@
         #pkgs.haskell.compiler.uhc    #: UHC compiler
         pkgs.haskell.compiler.jhc     #: JHC compiler
         # pkgs.haskell.compiler.ghcjs #: Javascript backend to GHC
+        ghc.doc                       #: GHC documentation
 
         # HLedger
         hledger          #: A Haskell-based double-entry accounting system
@@ -1017,7 +1020,7 @@
         cabal2nix        #: Generate Nix packages from Cabal files
         shake            #: Haskell-based build system
         shake-language-c #: Shake rules for building C, C++, and Objective C
-        #~shake-minify   #: Shake rules for source minification
+        shake-minify     #: Shake rules for source minification
 
         # Development
         haddocset         #: Generate Dash/Zeal docsets from Haddock docs
@@ -1025,15 +1028,18 @@
         intero            #: Improved version of ghci
         haddock-api       #: The Haddock API
         ghc               #: GHC API
-        ghc.doc           #: GHC documentation
         purescript-native #: Purescript compiler
+        ghcid             #: GHCi daemon
+        ghci-pretty       #: GHCi syntax highlighting
+        #~liquidhaskell   #: Refinement types for Haskell
+        ghc-proofs        #: Allows GHC to prove program equations for you
 
         # Pandoc
         pandoc          #: Convert text files easily
         pandoc-citeproc #: Use the Citation Style Language with Pandoc
 
         # Hakyll
-        #~hakyll  #: A static site generator written in Haskell
+        hakyll    #: A static site generator written in Haskell
         mighttpd2 #: A Warp-based static web server
         warp-tls  #: TLS support for Warp
 
@@ -1048,6 +1054,26 @@
         xmonad-utils       #: A small collection of utilities for xmonad
         yeganesh           #: A dmenu wrapper that shows commonly-used commands
 
+        # Yi
+        yi                 #: Yi editor
+        yi-core            #: Yi core library
+        yi-frontend-pango  #: Yi frontend based on Pango
+        yi-frontend-vty    #: Yi frontend based on VTY
+        yi-keymap-cua      #: Yi keymap: CUA
+        yi-keymap-emacs    #: Yi keymap: Emacs
+        #~yi-monokai       #: Yi color scheme: Monokai
+        #~yi-solarized     #: Yi color scheme: Solarized
+        yi-language        #: Various language-related Yi libraries
+        yi-misc-modes      #: Yi modes for various other languages
+        yi-mode-haskell    #: Yi mode for Haskell
+        yi-mode-javascript #: Yi mode for JavaScript
+        #~yi-contrib       #: User-contributed Yi libraries
+        yi-fuzzy-open      #: Fuzzy open plugin for Yi
+        yi-ireader         #: Yi incremental reader
+        yi-snippet         #: Yi support for snippets
+        yi-emacs-colours   #: Convert Emacs color names to Yi's Color type
+        yi-rope            #: A rope data structure used by Yi
+
         # Misc
         packdeps     #: Various tools for dealing with a Hackage database
         ghc-datasize #: Get the size of a Haskell data type
@@ -1058,7 +1084,7 @@
         ## ------------------------------ General ------------------------------
 
         ### Prelude
-        #~classy-prelude #: A typeclass-based prelude
+        classy-prelude #: A typeclass-based prelude
 
         ### Unicode
         base-unicode-symbols       #: Unicode Prelude
@@ -1069,6 +1095,7 @@
         lens-family          #: Older alternative to lens
         microlens            #: A smaller lens library
         foldl                #: Strict left folds
+        loops                #: Fast imperative loops
         free                 #: Free monads
         comonad              #: Comonads
         profunctors          #: Profunctors
@@ -1083,7 +1110,8 @@
         shake                #: Haskell build system
         uuid                 #: UUIDs for Haskell
         derive               #: Tools for deriving instances in Haskell
-        type-level-sets      #: Type level sets
+        type-list            #: Type-level lists and tuples
+        type-level-sets      #: Type-level sets
         singletons           #: Singletons
         recursion-schemes    #: Generalized bananas, lenses, and barbed wire
 
@@ -1107,12 +1135,12 @@
         clock   #: Access to high-resolution clock and timer functions
 
         ### Text manipulation
-        bytestring    #: Lazy and strict packed bytestrings
-        split         #: Split strings and lists
-        text          #: Packed unicode strings
-        text-icu      #: Unicode functions for Data.Text
-        #~hyphenation #: Hyphenate / line-break text
-        unicode-show  #: Show text with unescaped Unicode characters
+        bytestring   #: Lazy and strict packed bytestrings
+        split        #: Split strings and lists
+        text         #: Packed unicode strings
+        text-icu     #: Unicode functions for Data.Text
+        hyphenation  #: Hyphenate / line-break text
+        unicode-show #: Show text with unescaped Unicode characters
 
         ### General text processing
         pcre-heavy  #: Usable version of pcre-light
@@ -1155,15 +1183,15 @@
         hxt-css      #: CSS3 selectors for hxt
 
         ### Web data processing
-        aeson          #: Parse/render JSON
-        aeson-diff     #: Diff JSON
-        aeson-lens     #: Lenses for Aeson
-        hjsonschema    #: JSON Schema validator
-        html-conduit   #: Parse/render HTML
-        blaze-html     #: HTML combinators for Haskell
-        css-text       #: Parse/render CSS
-        email-validate #: Parse/render email addresses
-        github         #: Bindings to the GitHub API
+        aeson               #: Parse/render JSON
+        aeson-diff          #: Diff JSON
+        lens-aeson          #: Law-abiding lenses for aeson
+        hjsonschema_1_4_0_0 #: JSON Schema validator
+        html-conduit        #: Parse/render HTML
+        blaze-html          #: HTML combinators for Haskell
+        css-text            #: Parse/render CSS
+        email-validate      #: Parse/render email addresses
+        github              #: Bindings to the GitHub API
 
         ### Language processing
         haskell-src             #: Parse/render Haskell
@@ -1172,25 +1200,25 @@
         s-cargot                #: S-expression parser in Haskell
 
         ### Image processing
-        gloss                #: Easy-to-use bindings to OpenGL
-        FontyFruity          #: A Haskell TrueType parser
-        JuicyPixels          #: Load and store images in a variety of formats
-        Rasterific           #: A rasterizer written in pure Haskell
-        #~friday             #: Functional image processing
-        #~friday-juicypixels #: Convert between friday and JuicyPixels types
-        #~friday-scale-dct   #: Scale friday images with DCT
+        gloss              #: Easy-to-use bindings to OpenGL
+        FontyFruity        #: A Haskell TrueType parser
+        JuicyPixels        #: Load and store images in a variety of formats
+        Rasterific         #: A rasterizer written in pure Haskell
+        friday             #: Functional image processing
+        friday-juicypixels #: Convert between friday and JuicyPixels types
+        friday-scale-dct   #: Scale friday images with DCT
 
         ### Graph processing
-        graphviz          #: Bindings to the graphviz visualization library
-        fgl               #: The Functional Graph Library
-        #~graph-rewriting #: Monadic EDSL for graph rewriting
+        graphviz        #: Bindings to the graphviz visualization library
+        fgl             #: The Functional Graph Library
+        graph-rewriting #: Monadic EDSL for graph rewriting
 
         ### Network
         pcap #: Bindings to libpcap
 
         ### Command-line interfaces
-        brick                #: Terminal application UI
-        vty_5_14             #: Virtual terminal library
+        # brick              #: Terminal application UI
+        # vty_5_14           #: Virtual terminal library
         concurrent-output    #: Concurrent terminal output
         ascii-progress       #: An ASCII progress bar
         optparse-applicative #: CLI option parsers
@@ -1213,32 +1241,32 @@
         resource-pool #: A pooling abstraction for collections of resources
 
         ### Iteratees
-        conduit                  #: Deterministic resource handling for Haskell
-        conduit-combinators      #: Commonly-used combinators for conduit
-        #~classy-prelude-conduit #: Conduit instances for classy-prelude
-        conduit-audio            #: Conduits for audio
-        conduit-audio-sndfile    #: conduit-audio + sndfile
-        pipes                    #: Pipes
-        pipes-concurrency        #: Concurrency for pipes
-        pipes-safe               #: Resource management and exceptions for pipes
-        pipes-http               #: Network sockets for pipes
-        pipes-network            #: Network sockets for pipes
-        #~pipes-network-tls      #: TLS network sockets for pipes
-        pipes-attoparsec         #: Parsing for pipes
-        pipes-bytestring         #:
-        pipes-extras             #:
-        pipes-group              #:
-        pipes-parse              #:
-        pipes-wai                #:
-        #~pipes-courier          #:
-        pipes-text               #:
-        pipes-aeson              #:
-        #~pipes-binary           #:
-        pipes-zlib               #:
-        pipes-csv                #:
-        #~pipes-shell            #:
-        #~pipes-zeromq4          #:
-        process-streaming        #:
+        conduit                #: Deterministic resource handling for Haskell
+        conduit-combinators    #: Commonly-used combinators for conduit
+        classy-prelude-conduit #: Conduit instances for classy-prelude
+        conduit-audio          #: Conduits for audio
+        conduit-audio-sndfile  #: conduit-audio + sndfile
+        pipes                  #: Pipes
+        pipes-group            #: Group pipes streams into sub-streams
+        pipes-parse            #: Shared parsing idioms for pipes
+        pipes-safe             #: Resource management and exceptions for pipes
+        pipes-concurrency      #: Concurrency for pipes
+        pipes-extras           #: Extra utilities for pipes
+        pipes-http             #: Network sockets for pipes
+        pipes-network          #: Network sockets for pipes
+        #~pipes-network-tls    #: TLS network sockets for pipes
+        pipes-bytestring       #: Stream bytestrings with pipes
+        pipes-text             #: Stream text with pipes
+        pipes-wai              #: Pipes support for WAI
+        #~pipes-courier        #: Message passing for pipes
+        pipes-attoparsec       #: Parse with attoparsec in pipes
+        pipes-aeson            #: Parse JSON in pipes
+        pipes-binary           #: Parse binary data in pipes
+        pipes-zlib             #: (De)compress data with zlib in pipes
+        pipes-csv              #: Parse CSV in pipes
+        #~pipes-shell          #: Use pipes with System.Process
+        pipes-zeromq4          #: ZeroMQ integration with pipes
+        process-streaming      #: Streaming interface to system processes
 
         ### Testing
         HUnit                   #: HUnit is a testing framework for Haskell
@@ -1267,19 +1295,27 @@
         #~editable #: Edit data types on the command line
 
         ### Compilers
-        #~abt               #: Abstract binding trees
+        abt                 #: Abstract binding trees
         #~bound             #: Easy to use name binding
         #~llvm              #: Bindings to the LLVM compiler toolkit
         #~llvm-general      #: General purpose LLVM bindings
         #~llvm-general-pure #: Pure Haskell LLVM functionality (no FFI)
         language-c          #: C parser and pretty-printer library
+        language-boogie     #: Boogie parser and pretty-printer library
         language-dot        #: Graphviz DOT parser and pretty-printer library
         language-javascript #: Javascript parser and pretty-printer library
         language-lua        #: Lua parser and pretty-printer library
         language-nix        #: Nix parser and pretty-printer library
         hnix                #: Nix parser and pretty-printer library
+        unbound             #: Support for programming with names and binders
         unification-fd      #: Simple generic unification algorithms
-        #~term-rewriting    #: Yet another term-rewriting library
+        RepLib              #: Generic programming for structural polymorphism
+        term-rewriting      #: Yet another term-rewriting library
+        smtlib2             #: Communicate with an SMT solver
+        smtlib2-pipe        #: Communicate with an SMT solver
+        smtlib2-quickcheck  #: Communicate with an SMT solver
+        smtlib2-debug       #: Communicate with an SMT solver
+        smtlib2-timing      #: Communicate with an SMT solver
 
         ### FPGA
         clash-lib           #: A functional hardware description language
@@ -1304,13 +1340,13 @@
         libarchive-conduit #: Supports many archive formats
 
         ### Miscellaneous
-        data-default     #: Default values for data types
-        optional-args    #: A type for specifying optional function arguments
-        #~DataTreeView   #: A GTK widget for viewing generic instances of Data
-        #~dynamic-plot   #: Plot continuous/infinite data structures efficiently
-        mecha            #: Constructive solid modeling
-        #~patches-vector #: An algebraic notion of a patch
-        #~diff-parse     #: Parse diff files
+        data-default   #: Default values for data types
+        optional-args  #: A type for specifying optional function arguments
+        #~DataTreeView #: A GTK widget for viewing generic instances of Data
+        #~dynamic-plot #: Plot continuous/infinite data structures efficiently
+        mecha          #: Constructive solid modeling
+        patches-vector #: An algebraic notion of a patch
+        diff-parse     #: Parse diff files
 
         ## -------------------------- Data structures --------------------------
 
@@ -1323,7 +1359,7 @@
         ### Arrays
         matrix            #: Matrices based on Data.Vector
         accelerate        #: A high-performance embedded array language
-        #~accelerate-io   #: Conversion between accelerate and various backends
+        accelerate-io     #: Conversion between accelerate and various backends
         repa              #: Regular parallel arrays
         repa-io           #: Regular parallel arrays -- IO
         vector            #: Mutable and immutable Int-indexed arrays
@@ -1345,23 +1381,24 @@
         http-conduit #: Conduit adapter for http-client
 
         ### Web servers
-        servant          #: Combinators for defining webservices APIs
-        servant-server   #: Create servers from servant specifications
-        servant-client   #: Autogenerate Haskell to query servant APIs
-        servant-blaze    #: Servant support for blaze-html
-        servant-js       #: Autogenerate JavaScript to query servant APIs
-        #~servant-pandoc #: Create servant API documentation with Pandoc
-        scotty           #: A web microframework
-        websockets       #: WebSocket-capable servers
-        #~socket-io      #: A Socket.io server
-        yesod            #: A web framework
-        warp             #: A high-performance web server
+        servant        #: Combinators for defining webservices APIs
+        servant-server #: Create servers from servant specifications
+        servant-client #: Autogenerate Haskell to query servant APIs
+        servant-blaze  #: Servant support for blaze-html
+        servant-js     #: Autogenerate JavaScript to query servant APIs
+        servant-pandoc #: Create servant API documentation with Pandoc
+        scotty         #: A web microframework
+        websockets     #: WebSocket-capable servers
+        engine-io      #: An implementation of Engine.IO
+        socket-io      #: A Socket.IO server built on top of engine-io
+        yesod          #: A web framework
+        warp           #: A high-performance web server
 
         ### Databases
         persistent            #: Type-safe, multi-backend data serialization
         persistent-postgresql #: PostgreSQL backend for persistent
         persistent-sqlite     #: SQLite backend for persistent
-        #~esqueleto           #: A type-safe EDSL for SQL queries
+        esqueleto             #: A type-safe EDSL for SQL queries
         postgresql-simple     #: Simple Haskell interface to PostgreSQL
         acid-state            #: In-memory database with strong ACID guarantees
         vcache                #: Purports to be a better version of acid-state
@@ -1402,15 +1439,16 @@
         diagrams
         diagrams-svg
         diagrams-cairo
+        diagrams-gtk
         diagrams-graphviz
         diagrams-rasterific
         rasterific-svg
 
         ### Functional Reactive Programming
         varying              #: FRP framework
-        #~reflex             #: FRP framework
+        reflex               #: FRP framework
         reactive-banana      #: FRP framework
-        #~reactive-banana-wx #: wxWidgets for reactive-banana
+        reactive-banana-sdl2 #: SDL 2 for reactive-banana
         frpnow               #: FRP framework
         frpnow-gtk           #: GTK for frpnow
 
@@ -1420,9 +1458,6 @@
         gtk3       #: GTK 3 bindings
         sdl2       #: SDL 2 bindings
         sdl2-cairo #: SDL 2 + Cairo helpers
-        #~wx       #: wxHaskell
-        #~wxc      #: wxHaskell
-        #~wxcore   #: wxHaskell
       ];
     };
 

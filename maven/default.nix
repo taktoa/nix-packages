@@ -2,7 +2,7 @@
 
 assert jdk != null;
 
-let version = "3.2.5";
+let version = "3.3.9";
     mavenColorRoot = "http://dl.bintray.com/jcgay/maven/com/github/jcgay/maven/color";
 in
 stdenv.mkDerivation rec {
@@ -10,12 +10,12 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "mirror://apache/maven/maven-3/${version}/binaries/${name}-bin.tar.gz";
-    sha256 = "0md7fizam2lvl0b7fdlfjng6ywm283chmp382agzz4gmpmj046cc";
+    sha256 = "10pz00lf8gqvmjcmi1wlpsqqj9kvm8bqf0vl9wh5lsdlkaa9qgkf";
   };
 
   mavenColorLog4j2 = fetchurl {
-    url = "${mavenColorRoot}/maven-color-log4j2/1.1/maven-color-log4j2-1.1-bundle.tar.gz";
-    sha256 = "f5ec274cb9e854429ba82f28aaea9a6c149d35a7a40bbe86e0483da1df4f0843";
+    url = "${mavenColorRoot}/maven-color-gossip/2.0.0-beta/maven-color-gossip-2.0.0-beta-bundle.tar.gz";
+    sha256 = "0h8f65mgsv60mxhlvpnnhhr2wzd2lakfgwyai0h4sh71caj2xsmv";
   };
 
   mavenColorConf = ./log4j2.xml;

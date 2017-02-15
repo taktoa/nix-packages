@@ -257,4 +257,17 @@ in pythonPackages // (rec {
     platforms    = with lib.platforms; all;
     doCheck      = false;
   });
+
+  wllvm = mkPython (rec {
+    packageName  = "wllvm";
+    version      = "1.0.17";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "0yjqn63fn28pg7xz6l7zrq2f5izqw8ari51y6zkxdqwq5vrmhxy6";
+    propDeps     = [];
+    homepage     = "https://github.com/travitch/whole-program-llvm";
+    description  = "Run LLVM on a whole program.";
+    license      = with lib.licenses; [ mit.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+  });
 })
