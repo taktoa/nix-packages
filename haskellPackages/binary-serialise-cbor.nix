@@ -10,8 +10,8 @@ mkDerivation {
   version = "0.1.1.0";
   src = fetchgit {
     url = "https://github.com/well-typed/binary-serialise-cbor.git";
-    sha256 = "13zqdqg6q8xrww760r6p3a4byhxcy3fbrdmpfpyxc2krslmnlgid";
-    rev = "c7b1b628c1e1c5e8da468c2e3e05d8f5eb6c0e75";
+    sha256 = "1j72jfx83fr9xqqhbm769r3wcy05ixj83hl6qmhwy5adxfazfid5";
+    rev = "f5a286232e478802d45aa06e3d3f0a180d67d296";
   };
   libraryHaskellDepends = [
     array base bytestring containers ghc-prim hashable integer-gmp

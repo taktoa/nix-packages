@@ -1,27 +1,10 @@
-{ pkgs, haskellPackages }:
+{ pkgs }:
 
 with { inherit (pkgs.stdenv) lib; };
 
 with pkgs.haskell.lib;
 
-let
-
-  # We use fetchgit because fetchFromGitHub doesn't support git submodules
-  clash-source = pkgs.fetchgit {
-    url    = "https://github.com/clash-lang/clash-compiler.git";
-    # branch: master
-    rev    = "6b875d5ca807cf7d79744ee4a16e2b912e5b96c3";
-    sha256 = "11fkwgg9xg78gbh3apd35xdfkf87qkvg1hwhfxs1z4736w6rj8sb";
-    # # branch: ghc-8.0
-    # rev    = "7a7904ce3cb4f039c675a41d8d625b12a3892259";
-    # sha256 = "02pa9azkx1i45qchjwmhg3mks6lpvg4ri47vb6jgjzzwsnaw0b86";
-  };
-
-  mkClashLib = drv: name: dontCheck (overrideCabal drv (old: {
-    src = clash-source; prePatch = "cd ${name}";
-  }));
-
-in haskellPackages.override {
+{
   overrides = self: super: {
     # mkDerivation = args: ((drv: (drv // rec {
     #   passthru = drv.passthru // {
@@ -60,18 +43,14 @@ in haskellPackages.override {
 
     antigen-hs = self.callPackage ./antigen-hs {};
     nixfmt = self.callPackage ./nixfmt.nix {};
-    fltkhs = addPkgconfigDepend super.fltkhs pkgs.mesa_glu;
-    hjsonschema_1_4_0_0 = super.hjsonschema_1_4_0_0.overrideScope (self: super: {
-      hjsonpointer = super.hjsonpointer_1_1_0_1;
-    });
-    binary-serialise-cbor = self.callPackage ./binary-serialise-cbor.nix {};
+    #fltkhs = addPkgconfigDepend super.fltkhs pkgs.mesa_glu;
+    binary-serialise-cbor = doJailbreak (self.callPackage ./binary-serialise-cbor.nix {});
+    patches-vector = dontCheck super.patches-vector;
     language-javascript = self.callPackage ./language-javascript.nix {};
     purescript-native = dontCheck (self.callPackage ./purescript-native.nix {
-      bower-json     = self.bower-json_1_0_0_1;
       HUnit          = self.HUnit_1_5_0_0;
       hspec          = self.hspec_2_3_2;
       hspec-discover = self.hspec-discover_2_3_2;
-      turtle         = self.turtle_1_3_1;
     });
     #llvm-general-pure = self.callPackage ./llvm-general/llvm-general-pure.nix {};
     synthesizer-core = dontCheck super.synthesizer-core;
@@ -80,33 +59,17 @@ in haskellPackages.override {
     s-cargot = dontCheck super.s-cargot;
     friday-juicypixels = dontCheck super.friday-juicypixels;
     mighttpd2 = super.mighttpd2.overrideScope (self: super: {
-      http-client     = super.http-client_0_5_5;
-      http-client-tls = super.http-client-tls_0_3_3_1;
-      http-conduit    = super.http-conduit_2_2_3;
+      http-client_0_5_5 = super.http-client;
+      http-client-tls_0_3_3_1 = super.http-client-tls;
+      http-conduit_2_2_3 = super.http-conduit;
     });
     aeson-diff = dontCheck super.aeson-diff;
     bustle = dontCheck super.bustle;
-    # clash-lib = dontCheck super.clash-lib;
-    # clash-prelude = dontCheck super.clash-prelude;
-    clash-prelude = mkClashLib super.clash-prelude "clash-prelude";
-    clash-lib = mkClashLib super.clash-lib "clash-lib";
-    clash-ghc = mkClashLib super.clash-ghc "clash-ghc";
-    clash-vhdl = mkClashLib super.clash-vhdl "clash-vhdl";
-    clash-verilog = mkClashLib super.clash-verilog "clash-verilog";
-    clash-systemverilog = mkClashLib super.clash-systemverilog "clash-systemverilog";
     term-rewriting = doJailbreak (dontCheck super.term-rewriting);
-    # idris = self.callPackage ./idris.nix {};
-    turtle_1_3_1 = self.callPackage ./turtle.nix {
-      optparse-applicative = super.optparse-applicative_0_13_0_0;
-    };
+    idris_0_99 = doJailbreak (dontCheck super.idris_0_99);
     hexpat = super.hexpat.overrideScope (self: super: {
       List = self.callPackage ./List-0.5.2.nix {};
     });
-    yi = doJailbreak super.yi_0_13_5;
-    yi-rope = super.yi-rope_0_8;
-    yi-language = super.yi-language_0_13_5;
-    yi-fuzzy-open = super.yi-fuzzy-open_0_13_5;
-    yi-keymap-vim = dontCheck super.yi-keymap-vim;
     smtlib2-pipe = dontCheck super.smtlib2-pipe;
     LibClang = self.callPackage ./LibClang.nix {};
     stream-monad = doJailbreak super.stream-monad;
@@ -123,6 +86,49 @@ in haskellPackages.override {
     shake-minify = doJailbreak super.shake-minify;
     accelerate-io = doJailbreak super.accelerate-io;
     esqueleto = doJailbreak super.esqueleto;
-    reflex = doJailbreak super.reflex;
+    #reflex = doJailbreak super.reflex;
+    fficxx = self.callPackage ./fficxx-0.3.1.nix {};
+    fficxx-runtime = self.callPackage ./fficxx-runtime-0.3.nix {};
+    # liquid-fixpoint = dontCheck (self.callPackage ./liquid-fixpoint.nix {});
+    # liquiddesugar = self.callPackage ./liquiddesugar.nix {};
+    # liquidhaskell = dontCheck (self.callPackage ./liquidhaskell.nix {});
+    tasty-ant-xml = doJailbreak super.tasty-ant-xml;
+
+    # fltkhs = (
+    #   addPkgconfigDepend (
+    #     addBuildTools (self.callPackage ./fltkhs.nix {})
+    #     [pkgs.autoconf pkgs.fltk pkgs.mesa pkgs.libjpeg]
+    #   ) pkgs.fltk
+    # );
+
+    cabal-helper = self.callPackage ./cabal-helper-0.7.3.0.nix {};
+    ghc-mod = dontCheck (self.callPackage ./ghc-mod-5.7.0.0.nix {});
+    # hdevtools = self.callPackage ./hdevtools.nix {};
+    secp256k1 = addBuildTools super.secp256k1 [pkgs.autoconf pkgs.automake pkgs.libtool];
+
+    # haskell-gi-base   = doHaddock self.haskell-gi-base_0_20;
+    # haskell-gi        = doHaddock self.haskell-gi_0_20;
+    # gi-atk            = doHaddock self.gi-atk_2_0_11;
+    # gi-cairo          = doHaddock self.gi-cairo_1_0_11;
+    # gi-gdkpixbuf      = doHaddock self.gi-gdkpixbuf_2_0_11;
+    # gi-gio            = doHaddock self.gi-gio_2_0_11;
+    # gi-gobject        = doHaddock self.gi-gobject_2_0_11;
+    # gi-gtk            = doHaddock self.gi-gtk_3_0_11;
+    # gi-javascriptcore = doHaddock self.gi-javascriptcore_4_0_11;
+    # gi-gdk            = doHaddock self.gi-gdk_3_0_11;
+    # gi-glib           = doHaddock self.gi-glib_2_0_11;
+    # gi-pango          = doHaddock self.gi-pango_1_0_11;
+    # gi-soup           = doHaddock self.gi-soup_2_4_11;
+    gi-secret         = self.callPackage ./gi-secret.nix {};
+    # gi-webkit         = doHaddock self.gi-webkit_3_0_11;
+
+    servant-elm = dontCheck super.servant-elm;
+
+    llvm-hs-pure = self.callPackage ./llvm-hs-pure.nix {};
+    llvm-hs = self.callPackage ./llvm-hs.nix {
+      llvm-config = pkgs.llvm_4;
+    };
+
+    lzma = dontCheck super.lzma;
   };
 }

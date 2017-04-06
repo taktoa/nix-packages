@@ -270,4 +270,18 @@ in pythonPackages // (rec {
     maintainers  = with lib.maintainers; [ taktoa ];
     platforms    = with lib.platforms; all;
   });
+
+  wakatime = mkPython (rec {
+    packageName  = "wakatime";
+    version      = "7.0.4";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "0k23czswrkqgr2z5r35yb8is3s0w9169d4wjmbzrlagvkjxh19ym";
+    propDeps     = [];
+    homepage     = "https://github.com/wakatime/wakatime";
+    description  = "Time tracking program.";
+    license      = with lib.licenses; [ bsd3.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+    doCheck      = false;
+  });
 })

@@ -7,6 +7,9 @@
 #<# ├────────────────────────┤ General configuration ├─────────────────────────┤
 #<# └────────────────────────┴───────────────────────┴─────────────────────────┘
 
+  permittedInsecurePackages = [
+    "webkitgtk-2.4.11"
+  ];
 
   cabal = {
     enableLibraryProfiling = true;
@@ -89,7 +92,7 @@
       paths = with pkgs; [ libg15 libg15render g15composer g15daemon g15macro ];
     };
 
-    teamspeak_client = pkgs.qt55.callPackage ./teamspeak/client.nix {};
+    #teamspeak_client = pkgs.qt55.callPackage ./teamspeak/client.nix {};
 
     fbset = pkgs.callPackage ./fbset {};
 
@@ -130,6 +133,7 @@
     zscreen = pkgs.callPackage ./zscreen {};
 
     git-credential-gnome-keyring = pkgs.callPackage ./git-cred-gnome {};
+    git-credential-libsecret = pkgs.callPackage ./git-cred-libsecret {};
 
     libxcomp = pkgs.callPackage ./libxcomp {};
 
@@ -202,6 +206,8 @@
     steam = pkgs.steam.override { newStdcpp = true; };
 
     lib = pkgs.stdenv.lib // {
+      inherit (builtins) parseDrvName;
+
       extra = {
         # The sum of a list of numbers.
         sum = lib.fold (x: y: x + y) 0;
@@ -251,8 +257,9 @@
     # for some reason chromium ends up building from source
     chromium = (import <nixpkgs> { config.packageOverrides = pkgs: {}; }).chromium.override {
       enablePepperFlash = true;
-      enableWideVine    = true;
+      #enableWideVine    = true;
     };
+    #chromium = pkgs.chromium;
 
     i3lock-dpms = pkgs.writeScriptBin "slock" ''
         #!/usr/bin/env bash
@@ -443,22 +450,24 @@
 
     youtube-dl = pkgs.youtube-dl.overrideDerivation (old: rec {
       name = "youtube-dl-${version}";
-      version = "2017.02.14";
+      version = "2017.03.10";
       src = pkgs.fetchurl {
         url = "http://youtube-dl.org/downloads/${version}/${name}.tar.gz";
-        sha256 = "1qcsixjysqrwx50xmv0mz3m5xd8i0rc2l5fnj5pl300r9j22kpkz";
+        sha256 = "0ccrwhgycz17xmsdsd0rsv7khhp1z7dnwp7fkxx7dxbivjf0h0a4";
       };
     });
 
-    imgur-screenshot = pkgs.imgur-screenshot.overrideDerivation (old: rec {
-      name = "imgur-screenshot-1.7.1";
-      src = pkgs.fetchFromGitHub {
-        owner  = "jomo";
-        repo   = "imgur-screenshot";
-        rev    = "e5678f51640b1045fcfdba385d7462e655a4af03";
-        sha256 = "01wiqrc7xxvk7kzgw756jahwa0szb200l8030iwfcgxb679k3v0j";
-      };
-    });
+    imgur-screenshot = (
+      assert pkgs.imgur-screenshot.name == "imgur-screenshot-1.7.1";
+      pkgs.imgur-screenshot.overrideDerivation (old: rec {
+        name = "imgur-screenshot-1.7.4";
+        src = pkgs.fetchFromGitHub {
+          owner  = "jomo";
+          repo   = "imgur-screenshot";
+          rev    = "1c655554dbdfa38ecafb55e708e87259b8406d80";
+          sha256 = "1bhi9sk8v7szh2fj13qwvdwzy5dw2w4kml86sy1ns1rn0xin0cgr";
+        };
+      }));
 
     sphinxbase = pkgs.sphinxbase.overrideDerivation (old: rec {
       name = "sphinxbase-5prealpha";
@@ -629,10 +638,21 @@
       ];
     };
 
-    haskellPackages = pkgs.callPackage ./haskellPackages {
-      inherit pkgs;
-      haskellPackages = pkgs.haskellPackages;
-    };
+    liquidHaskellPackages = (pkgs.haskell.packages.ghc7103.override {
+      overrides = self: super: with pkgs.haskell.lib; {
+        tasty-ant-xml = doJailbreak super.tasty-ant-xml;
+        liquid-fixpoint = dontCheck super.liquid-fixpoint;
+        liquidhaskell = dontCheck super.liquidhaskell;
+      };
+    });
+
+    liquidhaskell = liquidHaskellPackages.liquidhaskell;
+
+    makeHaskellPackages = (hp: hp.override
+      (import ./haskellPackages/default.nix { inherit pkgs; }));
+
+    haskellPackages = makeHaskellPackages pkgs.haskellPackages;
+    ghcjsPackages = makeHaskellPackages pkgs.haskell.packages.ghcjs;
 
     profiledHaskellPackages = pkgs.haskellPackages.override {
       overrides = self: super: {
@@ -644,13 +664,14 @@
 
     hoogleEnabled = true;
 
-    ghcWith = (if hoogleEnabled then haskellPackages.ghcWithHoogle else haskellPackages.ghcWithPackages);
+    ghcWith = haskellPackages.${if hoogleEnabled then "ghcWithHoogle" else "ghcWithPackages"};
 
     haskellEnv = ({ name, paths }:
       pkgs.buildEnv {
         inherit name;
         paths = [ (ghcWith paths) ];
         ignoreCollisions = true;
+        passthru = { inherit paths; };
       });
 
     idrisPackages = pkgs.idrisPackages.override {
@@ -710,7 +731,7 @@
     };
 
     emacsPackages = pkgs.emacsPackagesNg.override (super: self: rec {
-      emacsHelpers = mkEmacsHelpers pkgs.emacs25;
+      emacsHelpers = mkEmacsHelpers pkgs.emacs;
       emacs = emacsHelpers.emacsGTK3;
     });
 
@@ -867,6 +888,7 @@
       name = "emacsPkgs";
       paths = p: with p; [
         rtags
+        ghc-mod
         haskellPackages.Agda
       ];
     };
@@ -901,7 +923,7 @@
       name = "guiPkgs";
       paths = with pkgs; [
         arandr
-        bustle
+        # bustle
         conkeror
         deluge
         dmenu
@@ -960,8 +982,9 @@
       name = "haskellProgPkgs";
       paths = with pkgs; with haskellPackages; [
         ### Build systems
-        hi    #: Project template system
-        stack #: Wrapper around Cabal
+        #~hi   #: Project template system
+        #stack #: Wrapper around Cabal
+        hpack  #: Generate Cabal files from more maintainable YAML
 
         ### Runtime inspection
         threadscope #: Haskell graphical profiler
@@ -989,8 +1012,8 @@
         djinn            #: Find function definitions via parametricity
         darcs            #: Haskell version control tool
         git-annex        #: Manage large files with git
-        cgrep            #: Semantic code search
-        bench            #: Benchmarking for command-line programs
+        #~cgrep          #: Semantic code search
+        #~bench          #: Benchmarking for command-line programs
         xml-to-json      #: Convert XML to JSON
         xml-to-json-fast #: Faster, but less correct, conversion of XML to JSON
         hp2pretty        #: Render heap profiles in a more pretty way
@@ -1013,6 +1036,7 @@
         #~standalone-haddock #: Standalone Haddock
         c2hs                 #: FFI helpers
         c2hsc                #: FFI helpers
+        Cabal_1_24_2_0       #: Latest version of Cabal
 
         # Build systems
         cabal-install    #: Haskell package manager
@@ -1023,16 +1047,16 @@
         shake-minify     #: Shake rules for source minification
 
         # Development
-        haddocset         #: Generate Dash/Zeal docsets from Haddock docs
-        haskell-docs      #: Documentation browser
-        intero            #: Improved version of ghci
-        haddock-api       #: The Haddock API
-        ghc               #: GHC API
-        purescript-native #: Purescript compiler
-        ghcid             #: GHCi daemon
-        ghci-pretty       #: GHCi syntax highlighting
-        #~liquidhaskell   #: Refinement types for Haskell
-        ghc-proofs        #: Allows GHC to prove program equations for you
+        #~haddocset         #: Generate Dash/Zeal docsets from Haddock docs
+        haskell-docs        #: Documentation browser
+        intero              #: Improved version of ghci
+        haddock-api         #: The Haddock API
+        ghc                 #: GHC API
+        #~purescript-native #: Purescript compiler
+        ghcid               #: GHCi daemon
+        ghci-pretty         #: GHCi syntax highlighting
+        #~liquidhaskell     #: Refinement types for Haskell
+        ghc-proofs          #: Allows GHC to prove program equations for you
 
         # Pandoc
         pandoc          #: Convert text files easily
@@ -1044,15 +1068,15 @@
         warp-tls  #: TLS support for Warp
 
         # XMonad
-        DescriptiveKeys    #: Specify self-documenting XMonad keybindings
-        xmobar             #: An information bar written in Haskell
-        xmonad             #: A tiling window manager written in Haskell
-        xmonad-contrib     #: Contributed libraries for xmonad
-        xmonad-contrib-gpl #: GPL-licensed parts of xmonad-contrib
-        xmonad-extras      #: Extra libraries for xmonad
-        xmonad-screenshot  #: A screenshot library for xmonad
-        xmonad-utils       #: A small collection of utilities for xmonad
-        yeganesh           #: A dmenu wrapper that shows commonly-used commands
+        DescriptiveKeys      #: Specify self-documenting XMonad keybindings
+        xmobar               #: An information bar written in Haskell
+        xmonad               #: A tiling window manager written in Haskell
+        xmonad-contrib       #: Contributed libraries for xmonad
+        #~xmonad-contrib-gpl #: GPL-licensed parts of xmonad-contrib
+        xmonad-extras        #: Extra libraries for xmonad
+        xmonad-screenshot    #: A screenshot library for xmonad
+        xmonad-utils         #: A small collection of utilities for xmonad
+        yeganesh             #: A dmenu wrapper that shows common commands
 
         # Yi
         yi                 #: Yi editor
@@ -1061,6 +1085,7 @@
         yi-frontend-vty    #: Yi frontend based on VTY
         yi-keymap-cua      #: Yi keymap: CUA
         yi-keymap-emacs    #: Yi keymap: Emacs
+        yi-keymap-vim      #: Yi keymap: Vim
         #~yi-monokai       #: Yi color scheme: Monokai
         #~yi-solarized     #: Yi color scheme: Solarized
         yi-language        #: Various language-related Yi libraries
@@ -1135,12 +1160,12 @@
         clock   #: Access to high-resolution clock and timer functions
 
         ### Text manipulation
-        bytestring   #: Lazy and strict packed bytestrings
-        split        #: Split strings and lists
-        text         #: Packed unicode strings
-        text-icu     #: Unicode functions for Data.Text
-        hyphenation  #: Hyphenate / line-break text
-        unicode-show #: Show text with unescaped Unicode characters
+        bytestring     #: Lazy and strict packed bytestrings
+        split          #: Split strings and lists
+        text           #: Packed unicode strings
+        text-icu       #: Unicode functions for Data.Text
+        hyphenation    #: Hyphenate / line-break text
+        #~unicode-show #: Show text with unescaped Unicode characters
 
         ### General text processing
         pcre-heavy  #: Usable version of pcre-light
@@ -1173,31 +1198,35 @@
         hex               #: Convert strings to/from hexadecimal
 
         ### Markup processing
-        xml-conduit  #: Parse/render XML
-        xml-lens     #: Lenses for xml-conduit
-        dom-selector #: CSS3 selectors for xml-conduit
-        yaml         #: Parse/render YAML
-        markdown     #: Parse/render Markdown
-        xml          #: More XML stuff
-        hxt          #: The Haskell XML Toolkit
-        hxt-css      #: CSS3 selectors for hxt
+        xml-conduit         #: Parse/render XML
+        xml-lens            #: Lenses for xml-conduit
+        dom-selector        #: CSS3 selectors for xml-conduit
+        yaml                #: Parse/render YAML
+        markdown            #: Parse/render Markdown
+        xml                 #: More XML stuff
+        hxt                 #: The Haskell XML Toolkit
+        hxt-css             #: CSS3 selectors for hxt
+        tagsoup             #: Unstructured HTML parser
+        #~tagsoup-selection #: CSS3 selectors for tagsoup
+        hxt-tagsoup         #: Interface between tagsoup and HXT
+        fast-tagsoup        #: Faster parser for tagsoup
 
         ### Web data processing
-        aeson               #: Parse/render JSON
-        aeson-diff          #: Diff JSON
-        lens-aeson          #: Law-abiding lenses for aeson
-        hjsonschema_1_4_0_0 #: JSON Schema validator
-        html-conduit        #: Parse/render HTML
-        blaze-html          #: HTML combinators for Haskell
-        css-text            #: Parse/render CSS
-        email-validate      #: Parse/render email addresses
-        github              #: Bindings to the GitHub API
+        aeson          #: Parse/render JSON
+        #~aeson-diff   #: Diff JSON
+        lens-aeson     #: Law-abiding lenses for aeson
+        hjsonschema    #: JSON Schema validator
+        html-conduit   #: Parse/render HTML
+        blaze-html     #: HTML combinators for Haskell
+        css-text       #: Parse/render CSS
+        email-validate #: Parse/render email addresses
+        github         #: Bindings to the GitHub API
 
         ### Language processing
-        haskell-src             #: Parse/render Haskell
-        haskell-src-exts_1_18_2 #: Parse/render Haskell
-        hint                    #: Interpret Haskell
-        s-cargot                #: S-expression parser in Haskell
+        haskell-src      #: Parse/render Haskell
+        haskell-src-exts #: Parse/render Haskell
+        hint             #: Interpret Haskell
+        s-cargot         #: S-expression parser in Haskell
 
         ### Image processing
         gloss              #: Easy-to-use bindings to OpenGL
@@ -1230,10 +1259,11 @@
         enclosed-exceptions #: Exceptions amenable to asynchrony
 
         ### Monads
-        extensible-effects #: Extensible effects
-        lifted-base        #: IO operations lifted to monad typeclasses
-        mtl                #: Monad transformers for Haskell
-        monad-loops        #: Monadic control logic
+        #~extensible-effects #: Extensible effects
+        lifted-base          #: IO operations lifted to monad typeclasses
+        mtl                  #: Monad transformers for Haskell
+        monad-loops          #: Monadic control logic
+        ether                #: Tagged monad transformers and classes
 
         ### Concurrency
         async         #: A concurrent thread abstraction
@@ -1262,11 +1292,12 @@
         pipes-attoparsec       #: Parse with attoparsec in pipes
         pipes-aeson            #: Parse JSON in pipes
         pipes-binary           #: Parse binary data in pipes
-        pipes-zlib             #: (De)compress data with zlib in pipes
+        #~pipes-zlib           #: (De)compress data with zlib in pipes
         pipes-csv              #: Parse CSV in pipes
         #~pipes-shell          #: Use pipes with System.Process
         pipes-zeromq4          #: ZeroMQ integration with pipes
         process-streaming      #: Streaming interface to system processes
+        daemons                #: Daemons based on pipes
 
         ### Testing
         HUnit                   #: HUnit is a testing framework for Haskell
@@ -1339,14 +1370,37 @@
         tar                #: The tar archive format
         libarchive-conduit #: Supports many archive formats
 
+        ### Logging
+        fast-logger  # A fast logging system
+        monad-logger # A monad transformer approach for logging
+
+        ### GObject Introspection
+        haskell-gi        #: Automatically generate GI bindings
+        gi-atk            #: GI bindings for ATK
+        gi-cairo          #: GI bindings for Cairo
+        gi-gdkpixbuf      #: GI bindings for GDK PixBuf
+        gi-gio            #: GI bindings for GIO
+        gi-gobject        #: GI bindings for GObject
+        gi-gtk            #: GI bindings for GTK 3
+        gi-javascriptcore #: GI bindings for JavaScriptCore
+        gi-gdk            #: GI bindings for GDK
+        gi-glib           #: GI bindings for GLib
+        gi-pango          #: GI bindings for Pango
+        gi-soup           #: GI bindings for libsoup
+        gi-secret         #: GI bindings for libsecret
+        #~gi-webkit2      #: GI bindings for WebKit2
+
         ### Miscellaneous
-        data-default   #: Default values for data types
-        optional-args  #: A type for specifying optional function arguments
-        #~DataTreeView #: A GTK widget for viewing generic instances of Data
-        #~dynamic-plot #: Plot continuous/infinite data structures efficiently
-        mecha          #: Constructive solid modeling
-        patches-vector #: An algebraic notion of a patch
-        diff-parse     #: Parse diff files
+        data-default     #: Default values for data types
+        optional-args    #: A type for specifying optional function arguments
+        #~DataTreeView   #: A GTK widget for viewing generic instances of Data
+        #~dynamic-plot   #: Plot continuous/infinite data structures efficiently
+        mecha            #: Constructive solid modeling
+        patches-vector   #: An algebraic notion of a patch
+        diff-parse       #: Parse diff files
+        chesshs          #: Parse chess PGN notation
+        #~fficxx         #: C++ FFI generator
+        #~fficxx-runtime #: C++ FFI generator
 
         ## -------------------------- Data structures --------------------------
 
@@ -1362,6 +1416,7 @@
         accelerate-io     #: Conversion between accelerate and various backends
         repa              #: Regular parallel arrays
         repa-io           #: Regular parallel arrays -- IO
+        repa-algorithms   #: Regular parallel arrays -- Algorithms
         vector            #: Mutable and immutable Int-indexed arrays
         vector-algorithms #: Efficient algorithms for vector arrays
         vector-instances  #: Orphan instances for the vector package
@@ -1371,7 +1426,7 @@
         ### IPC
         zeromq4-haskell #: Low latency message queue
         protobuf        #: C++-compatible "type-safe" binary serialization
-        dbus            #: DBus client and
+        dbus            #: DBus client and server
 
         ### Web clients
         curl         #: Bindings to libcurl
@@ -1379,20 +1434,23 @@
         wreq         #: Simple web requests
         http-client  #: HTTP client
         http-conduit #: Conduit adapter for http-client
+        http2        #: Haskell HTTP2 library
 
         ### Web servers
-        servant        #: Combinators for defining webservices APIs
-        servant-server #: Create servers from servant specifications
-        servant-client #: Autogenerate Haskell to query servant APIs
-        servant-blaze  #: Servant support for blaze-html
-        servant-js     #: Autogenerate JavaScript to query servant APIs
-        servant-pandoc #: Create servant API documentation with Pandoc
-        scotty         #: A web microframework
-        websockets     #: WebSocket-capable servers
-        engine-io      #: An implementation of Engine.IO
-        socket-io      #: A Socket.IO server built on top of engine-io
-        yesod          #: A web framework
-        warp           #: A high-performance web server
+        servant            #: Combinators for defining webservices APIs
+        servant-server     #: Create servers from servant specifications
+        servant-client     #: Autogenerate Haskell to query servant APIs
+        servant-blaze      #: Servant support for blaze-html
+        servant-js         #: Autogenerate JavaScript to query servant APIs
+        servant-pandoc     #: Create servant API documentation with Pandoc
+        servant-purescript #: Generate PureScript types from your Servant API
+        servant-elm        #: Generate Elm types from your Servant API
+        scotty             #: A web microframework
+        websockets         #: WebSocket-capable servers
+        engine-io          #: An implementation of Engine.IO
+        socket-io          #: A Socket.IO server built on top of engine-io
+        yesod              #: A web framework
+        warp               #: A high-performance web server
 
         ### Databases
         persistent            #: Type-safe, multi-backend data serialization
@@ -1445,19 +1503,19 @@
         rasterific-svg
 
         ### Functional Reactive Programming
-        varying              #: FRP framework
-        reflex               #: FRP framework
-        reactive-banana      #: FRP framework
-        reactive-banana-sdl2 #: SDL 2 for reactive-banana
-        frpnow               #: FRP framework
-        frpnow-gtk           #: GTK for frpnow
+        varying                #: FRP framework
+        #~reflex               #: FRP framework
+        reactive-banana        #: FRP framework
+        #~reactive-banana-sdl2 #: SDL 2 for reactive-banana
+        frpnow                 #: FRP framework
+        frpnow-gtk             #: GTK for frpnow
 
         ### Bindings
-        cairo      #: Cairo bindings
-        gtk        #: GTK 3 bindings
-        gtk3       #: GTK 3 bindings
-        sdl2       #: SDL 2 bindings
-        sdl2-cairo #: SDL 2 + Cairo helpers
+        cairo        #: Cairo bindings
+        gtk          #: GTK 3 bindings
+        gtk3         #: GTK 3 bindings
+        sdl2         #: SDL 2 bindings
+        #~sdl2-cairo #: SDL 2 + Cairo helpers
       ];
     };
 
@@ -1544,6 +1602,7 @@
       name = "nodePkgs";
       paths = with pkgs; [
         nodejs
+        nodePackages.bower
       ];
     };
 
@@ -1701,6 +1760,7 @@
         git-lfs
         gitFull
         git-credential-gnome-keyring
+        git-credential-libsecret
         mercurial
         subversion
       ];
