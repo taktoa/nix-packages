@@ -92,6 +92,8 @@
       paths = with pkgs; [ libg15 libg15render g15composer g15daemon g15macro ];
     };
 
+    logkeys = pkgs.callPackage ./logkeys {};
+
     #teamspeak_client = pkgs.qt55.callPackage ./teamspeak/client.nix {};
 
     fbset = pkgs.callPackage ./fbset {};

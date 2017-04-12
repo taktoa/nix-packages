@@ -1,0 +1,15 @@
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 945a904..438f24b 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -6,8 +6,4 @@ llk_SOURCES = llk.cc
+ llkk_SOURCES = llkk.cc
+ 
+ install-exec-hook:
+-	chown root\: $(DESTDIR)$(bindir)/llk
+-	chmod u+s    $(DESTDIR)$(bindir)/llk
+-	chown root\: $(DESTDIR)$(bindir)/llkk
+-	chmod u+s    $(DESTDIR)$(bindir)/llkk
+-  
+\ No newline at end of file
++
