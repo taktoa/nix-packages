@@ -1148,10 +1148,11 @@
         hpath          #: Another type-safe path library
         process        #: Launch processes from Haskell
         HFuse          #: Bindings for FUSE in Haskell
-        hit            #: Tools for interacting with the git store
+        hit            #: Tools for interacting with the Git store
+        hit-graph      #: Extract a commit graph with `hit`
         gitlib         #: A high-level interface to the Git API
         gitlib-libgit2 #: The libgit2 backend to gitlib
-        filestore      #: A high-level interface to multiple versioning file stores
+        filestore      #: A high-level interface to multiple VCS file stores
         mmap           #: Gives access to the mmap syscall
         #~libzfs       #: Bindings to the ZFS API
         btrfs          #: Bindings to the btrfs API
