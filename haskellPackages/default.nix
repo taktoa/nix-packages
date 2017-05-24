@@ -130,5 +130,18 @@ with pkgs.haskell.lib;
     };
 
     lzma = dontCheck super.lzma;
+
+    git-vogue = doJailbreak (self.callPackage ./git-vogue.nix {
+      git = pkgs.gitFull;
+    });
+    packunused = doJailbreak (self.callPackage ./packunused.nix {});
+    hlint_2_0_5 = self.callPackage ./hlint-2.0.5.nix {};
+
+    stylish-haskell = super.stylish-haskell.override {
+      haskell-src-exts = super.haskell-src-exts_1_19_1;
+    };
+    stylish-haskell_0_8_0_0 = super.stylish-haskell_0_8_0_0.override {
+      haskell-src-exts = super.haskell-src-exts_1_19_1;
+    };
   };
 }

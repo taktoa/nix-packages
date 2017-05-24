@@ -169,6 +169,8 @@
 
     journal-notify = pkgs.callPackage ./journal-notify {};
 
+    peek = pkgs.callPackage ./peek {};
+
     hipspec = pkgs.haskellPackages.callPackage ./hipspec {};
 
     #lxqt = lxqt09;
@@ -187,13 +189,13 @@
 
     #wpa_supplicant = pkgs.callPackage ./wpa_supplicant {};
 
-    qtspim = pkgs.callPackage ./qtspim {};
+    #qtspim = pkgs.callPackage ./qtspim {};
 
     westonRift = pkgs.weston.overrideDerivation (old: {
       src = pkgs.fetchFromGitHub {
-        owner = "Nealefelaen";
-        repo = "weston-rift";
-        rev = "6df786bae015f014a4b5d85eb048fc827a09a9b7";
+        owner  = "Nealefelaen";
+        repo   = "weston-rift";
+        rev    = "6df786bae015f014a4b5d85eb048fc827a09a9b7";
         sha256 = "1a7rdjvaq9clp9467yhlsl6mfz6zppmg1n566lqvb8xa2ixwa4fq";
       };
 
@@ -825,7 +827,7 @@
         psmisc
         pv
         ranger
-        resume-cli
+        #resume-cli
         rlwrap
         rtags
         screen
@@ -858,8 +860,8 @@
       paths = with pkgs; [
         # gcc-arm-embedded
         # androidsdk_4_4
-        clang
-        clang-analyzer
+        clang_4
+        # clang-analyzer
         cppcheck
         gdk_pixbuf
         gcc5
@@ -1014,6 +1016,8 @@
         djinn            #: Find function definitions via parametricity
         darcs            #: Haskell version control tool
         git-annex        #: Manage large files with git
+        git-vogue        #: A framework for git pre-commit hooks
+        packunused       #: Detect redundant Cabal package dependencies
         #~cgrep          #: Semantic code search
         #~bench          #: Benchmarking for command-line programs
         xml-to-json      #: Convert XML to JSON
@@ -1032,7 +1036,7 @@
         #~halberd            #: Add missing imports to a Haskell file
         hasktags             #: Generate vim/Emacs tags files from Haskell
         hdevtools            #: Development tools for Haskell
-        hlint                #: Check for code smell in Haskell source
+        hlint_2_0_5          #: Check for code smell in Haskell source
         hindent              #: Haskell source formatter
         stylish-haskell      #: Organize Haskell imports
         #~standalone-haddock #: Standalone Haddock
@@ -1213,6 +1217,8 @@
         #~tagsoup-selection #: CSS3 selectors for tagsoup
         hxt-tagsoup         #: Interface between tagsoup and HXT
         fast-tagsoup        #: Faster parser for tagsoup
+        xlsx                #: Parse Microsoft Excel XML files
+        HaTeX               #: Render TeX files with Haskell
 
         ### Web data processing
         aeson          #: Parse/render JSON
@@ -1228,8 +1234,9 @@
         ### Language processing
         haskell-src      #: Parse/render Haskell
         haskell-src-exts #: Parse/render Haskell
+        haskell-names    #: Name resolution for Haskell
         hint             #: Interpret Haskell
-        s-cargot         #: S-expression parser in Haskell
+        s-cargot         #: S-expression parser
 
         ### Image processing
         gloss              #: Easy-to-use bindings to OpenGL
@@ -1361,6 +1368,9 @@
         ### Game Engine
         helm #: FRP game engine
 
+        ### Geometry
+        grid #: Grids and lattices
+
         ### Compression
         lz4    #: The LZ4 compression format
         lzma   #: The LZMA compression format
@@ -1416,7 +1426,7 @@
         ### Arrays
         matrix            #: Matrices based on Data.Vector
         accelerate        #: A high-performance embedded array language
-        accelerate-io     #: Conversion between accelerate and various backends
+        #~accelerate-io   #: Conversion between accelerate and various backends
         repa              #: Regular parallel arrays
         repa-io           #: Regular parallel arrays -- IO
         repa-algorithms   #: Regular parallel arrays -- Algorithms
@@ -1654,7 +1664,7 @@
         ps.scipy
         ps.numpy
         ps.pygments
-        ps.pygobject
+        ps.pygobject3
         ps.ptpython
         ps.jsonpatch
         ps.pep8
@@ -1667,8 +1677,8 @@
     rustPkgs = buildEnv {
       name = "rustPkgs";
       paths = with pkgs; [
-        rustPlatform.rust.rustc
-        rustPlatform.rust.cargo
+        rust.rustc
+        rust.cargo
         rustfmt
         rustracer
         rustracerd
