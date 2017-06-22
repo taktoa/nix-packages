@@ -1,13 +1,13 @@
 { stdenv, fetchFromGitHub }:
 
 stdenv.mkDerivation {
-  name = "tinycbor-20160711";
+  name = "tinycbor-0.4.1";
 
   src = fetchFromGitHub {
     owner = "01org";
     repo = "tinycbor";
-    rev = "e73e4d87bee54472250ec6d6390acdf7f5b40d9e";
-    sha256 = "1m3zl7gdcpb6xjsr789kkf6g3fc1i9fg6xjw1jllssykmwjy57hy";
+    rev = "acf202a38118ed049785d210b5de84effa43c3de";
+    sha256 = "03pwcp6p6bphi0216aw6d2skh6xl8i6kk8hchasbmdbq6lawy77h";
   };
 
   installPhase = ''

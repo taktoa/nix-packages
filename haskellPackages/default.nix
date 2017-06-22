@@ -143,5 +143,7 @@ with pkgs.haskell.lib;
     stylish-haskell_0_8_0_0 = super.stylish-haskell_0_8_0_0.override {
       haskell-src-exts = super.haskell-src-exts_1_19_1;
     };
+
+    weeder = self.callPackage ./weeder.nix {};
   };
 }

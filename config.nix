@@ -209,6 +209,11 @@
 
     steam = pkgs.steam.override { newStdcpp = true; };
 
+    factorio = pkgs.factorio.override {
+      username = "taktoa";
+      password = secret.factorioPassword;
+    };
+    
     lib = pkgs.stdenv.lib // {
       inherit (builtins) parseDrvName;
 
@@ -454,10 +459,10 @@
 
     youtube-dl = pkgs.youtube-dl.overrideDerivation (old: rec {
       name = "youtube-dl-${version}";
-      version = "2017.03.10";
+      version = "2017.05.29";
       src = pkgs.fetchurl {
         url = "http://youtube-dl.org/downloads/${version}/${name}.tar.gz";
-        sha256 = "0ccrwhgycz17xmsdsd0rsv7khhp1z7dnwp7fkxx7dxbivjf0h0a4";
+        sha256 = "11zh0h4hwwx39iv6qbkqbvf5a5mgj71ngj2kp7zmq7g0qh37x9rx";
       };
     });
 
