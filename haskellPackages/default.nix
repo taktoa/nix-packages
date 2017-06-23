@@ -93,6 +93,7 @@ with pkgs.haskell.lib;
     # liquiddesugar = self.callPackage ./liquiddesugar.nix {};
     # liquidhaskell = dontCheck (self.callPackage ./liquidhaskell.nix {});
     tasty-ant-xml = doJailbreak super.tasty-ant-xml;
+    hgettext = self.callPackage ./hgettext.nix {};
 
     # fltkhs = (
     #   addPkgconfigDepend (
@@ -143,5 +144,17 @@ with pkgs.haskell.lib;
     stylish-haskell_0_8_0_0 = super.stylish-haskell_0_8_0_0.override {
       haskell-src-exts = super.haskell-src-exts_1_19_1;
     };
+
+    prettyprinter = self.callPackage ./prettyprinter.nix {};
+    fragnix = dontCheck (doJailbreak (self.callPackage ./fragnix.nix {}));
+
+    Cabal_HEAD = self.callPackage ./cabal-taktoa.nix {};
+
+    versions = self.versions_3_1_1;
+    versions_3_0_0   = super.versions;
+    versions_3_1_1 = self.callPackage ./versions-3.1.1.nix {};
+
+    smallcheck-lens = doJailbreak super.smallcheck-lens;
+    tasty-lens = doJailbreak super.tasty-lens;
   };
 }

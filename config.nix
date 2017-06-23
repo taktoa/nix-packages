@@ -59,6 +59,8 @@
 
     smackage = pkgs.callPackage ./smackage {};
 
+    kati = pkgs.callPackage ./kati {};
+
     antlr4 = pkgs.callPackage ./antlr4 {};
 
     h2o = pkgs.callPackage ./h2o {};
@@ -69,7 +71,7 @@
 
     lm-math = pkgs.callPackage ./lm-math {};
 
-    pragmataPro = pkgs.callPackage ./nonfree/pragmata-pro {};
+    # pragmataPro = pkgs.callPackage ./nonfree/pragmata-pro {};
 
     enigma = pkgs.callPackage ./enigma {};
 
@@ -116,13 +118,13 @@
 
     rust-bindgen = pkgs.callPackage ./rust-bindgen {};
 
-    matlab = pkgs.callPackage ./nonfree/matlab {
-      fileInstallationKey = secret.matlabKey;
-      matlabIso = file:///opt/MATLAB-R2015a-Linux64.iso;
-      licensePath = ./include/license.dat;
-      matlabJDK = pkgs.openjdk8;
-      licenseAgreed = true;
-    };
+    # matlab = pkgs.callPackage ./nonfree/matlab {
+    #   fileInstallationKey = secret.matlabKey;
+    #   matlabIso = file:///opt/MATLAB-R2015a-Linux64.iso;
+    #   licensePath = ./include/license.dat;
+    #   matlabJDK = pkgs.openjdk8;
+    #   licenseAgreed = true;
+    # };
 
     nailgunClient = pkgs.callPackage ./nailgun-client {};
 
@@ -259,10 +261,10 @@
     setName = pkgs.lib.setName;
 
     # for some reason chromium ends up building from source
-    chromium = (import <nixpkgs> { config.packageOverrides = pkgs: {}; }).chromium.override {
-      enablePepperFlash = true;
-      #enableWideVine    = true;
-    };
+    # chromium = (import <nixpkgs> { config.packageOverrides = pkgs: {}; }).chromium.override {
+    #   enablePepperFlash = true;
+    #   #enableWideVine    = true;
+    # };
     #chromium = pkgs.chromium;
 
     i3lock-dpms = pkgs.writeScriptBin "slock" ''
@@ -410,17 +412,17 @@
       };
     });
 
-    chromiumFixed = pkgs.stdenv.mkDerivation {
-      name = "chromium-fixed-${(builtins.parseDrvName chromium.name).version}";
-      buildInputs = [ pkgs.makeWrapper ];
-      phases = "installPhase";
-      installPhase = ''
-          makeWrapper ${chromium}/bin/chromium $out/bin/chromium \
-            --set LD_PRELOAD ""
-          ln -sv $out/bin/chromium $out/bin/chromium-browser
-          ln -sv ${chromium}/share $out/share
-      '';
-    };
+    # chromiumFixed = pkgs.stdenv.mkDerivation {
+    #   name = "chromium-fixed-${(builtins.parseDrvName chromium.name).version}";
+    #   buildInputs = [ pkgs.makeWrapper ];
+    #   phases = "installPhase";
+    #   installPhase = ''
+    #       makeWrapper ${chromium}/bin/chromium $out/bin/chromium \
+    #         --set LD_PRELOAD ""
+    #       ln -sv $out/bin/chromium $out/bin/chromium-browser
+    #       ln -sv ${chromium}/share $out/share
+    #   '';
+    # };
 
     freetype = pkgs.freetype.override {
       useEncumberedCode = true;
@@ -519,6 +521,16 @@
         sha256 = "1mcnzr8xf0gvkk9nq64sp17m66z4ywcskb10sb0mr03mmg4fs5c8";
       };
       patches = [];
+    });
+
+    rofi-pass = pkgs.rofi-pass.overrideDerivation (old: rec {
+      name = "rofi-pass-1.5.0";
+      src = pkgs.fetchFromGitHub {
+        owner  = "carnager";
+        repo   = "rofi-pass";
+        rev    = "db8282e3d3beb0d89475f911060db2b1b17ed227";
+        sha256 = "08chbn966140p3gmgalkhhm01ym64fvb6d2w5mbwpyl0986m89ba";
+      };
     });
 
     inherit (python27Packages) ocrodjvu csvkit gst-gtklaunch;
@@ -775,6 +787,18 @@
       ];
     };
 
+    prey-bash-client = pkgs.prey-bash-client.overrideDerivation (old: rec {
+      name = "prey-bash-client-${version}";
+      version = "0.6.4";
+
+      src = pkgs.fetchFromGitHub {
+        owner  = "prey";
+        repo   = "prey-bash-client";
+        rev    = "v${version}";
+        sha256 = "1xsycna835k6qlg0ch3packx69j04biky1iba5h8x7351rz3bf85";
+      };
+    });
+
 #<#                               ┌──────────────┐
 #<# ──────────────────────────────┤ Package sets ├──────────────────────────────
 #<#                               └──────────────┘
@@ -891,7 +915,7 @@
     emacsPkgs = emacsEnv {
       name = "emacsPkgs";
       paths = p: with p; [
-        rtags
+        # rtags
         ghc-mod
         haskellPackages.Agda
       ];
@@ -901,7 +925,7 @@
       name = "fontPkgs";
       paths = with pkgs; [
         inconsolata
-        pragmataPro
+        # pragmataPro
         powerline-fonts
       ];
     };
@@ -927,7 +951,8 @@
       name = "guiPkgs";
       paths = with pkgs; [
         arandr
-        # bustle
+        bustle
+        # chromium
         conkeror
         deluge
         dmenu
@@ -1043,6 +1068,7 @@
         c2hs                 #: FFI helpers
         c2hsc                #: FFI helpers
         Cabal_1_24_2_0       #: Latest version of Cabal
+        #Cabal_HEAD          #: Development version of Cabal
 
         # Build systems
         cabal-install    #: Haskell package manager
@@ -1173,6 +1199,7 @@
         text-icu       #: Unicode functions for Data.Text
         hyphenation    #: Hyphenate / line-break text
         #~unicode-show #: Show text with unescaped Unicode characters
+        intern         #: Interned (hash-consed) text/bytestring types
 
         ### General text processing
         pcre-heavy  #: Usable version of pcre-light
@@ -1203,6 +1230,8 @@
         base64-bytestring #: Parse/render Base64
         unix-time         #: Parse/render times
         hex               #: Convert strings to/from hexadecimal
+        versions          #: Parse/render versions
+        semver            #: Parse/render Semantic Versions
 
         ### Markup processing
         xml-conduit         #: Parse/render XML
@@ -1220,9 +1249,15 @@
         xlsx                #: Parse Microsoft Excel XML files
         HaTeX               #: Render TeX files with Haskell
 
+        ### Pretty printing
+        pretty         #:
+        ansi-wl-pprint #:
+        prettyprinter  #:
+
         ### Web data processing
         aeson          #: Parse/render JSON
-        #~aeson-diff   #: Diff JSON
+        aeson-pretty   #: Pretty-print JSON
+        aeson-diff     #: Diff JSON
         lens-aeson     #: Law-abiding lenses for aeson
         hjsonschema    #: JSON Schema validator
         html-conduit   #: Parse/render HTML
@@ -1250,6 +1285,7 @@
         ### Graph processing
         graphviz        #: Bindings to the graphviz visualization library
         fgl             #: The Functional Graph Library
+        #~dag           #: Type-safe directed acyclic graphs
         graph-rewriting #: Monadic EDSL for graph rewriting
 
         ### Network
@@ -1312,20 +1348,34 @@
         ### Testing
         HUnit                   #: HUnit is a testing framework for Haskell
         hspec                   #: Hspec is a testing framework for Haskell
+        hspec-wai               #: Hspec support for WAI
+        hspec-wai-json          #: Hspec support for testing JSON APIs
         hspec-webdriver         #: Hspec support for webdriver
         hspec-laws              #: Test laws for standard type classes
         hspec-attoparsec        #: Test your attoparsec parsers with hspec
+        hspec-megaparsec        #: Test your megaparsec parsers with hspec
         hspec-expectations      #: Hspec combinators
-        hspec-expectations-lens #: Hspec expectations for the lens stuff
+        hspec-expectations-lens #: Hspec expectations for lens stuff
+        hspec-smallcheck        #: SmallCheck support for hspec
         tasty                   #: A generalized testing framework
+        tasty-lens              #: Test lens laws with Tasty
         tasty-rerun             #: Run tests by filtering the test tree
+        tasty-golden            #: Tasty support for golden tests
+        tasty-html              #: Tasty support for HTML reports
         tasty-hunit             #: Tasty support for HUnit
         tasty-hspec             #: Tasty support for Hspec
         tasty-quickcheck        #: Tasty support for QuickCheck
         tasty-smallcheck        #: Tasty support for SmallCheck
         tasty-ant-xml           #: Jenkins output for Tasty
         doctest                 #: Run examples in documentation as tests
+        doctest-prop            #: Property-based testing in doctest
+        cabal-doctest           #: Cabal helper for doctest
         fitspec                 #: Evolve functions from examples
+        QuickCheck              #: Property-based testing
+        quickcheck-instances    #: Extra instances for QuickCheck
+        smallcheck              #: Complete, automated testing up to some depth
+        smallcheck-lens         #: SmallCheck properties for lens
+        testing-feat            #: Functional Enumeration of Algebraic Types
 
         ### Benchmarking
         criterion #: Benchmarking library for Haskell
@@ -1406,6 +1456,7 @@
         ### Miscellaneous
         data-default     #: Default values for data types
         optional-args    #: A type for specifying optional function arguments
+        flow             #: Operators for diagrammatic composition
         #~DataTreeView   #: A GTK widget for viewing generic instances of Data
         #~dynamic-plot   #: Plot continuous/infinite data structures efficiently
         mecha            #: Constructive solid modeling
@@ -1414,6 +1465,8 @@
         chesshs          #: Parse chess PGN notation
         #~fficxx         #: C++ FFI generator
         #~fficxx-runtime #: C++ FFI generator
+        makefile_1_0_0_2 #: Makefile parser
+        spdx             #: SPDX license language
 
         ## -------------------------- Data structures --------------------------
 
@@ -1750,7 +1803,7 @@
           #scheme-full = {
           #  pkgs = map (x: lib.deepSeq x x) texlive.scheme-full.pkgs;
           #};
-          inherit (texlive) scheme-full;
+          inherit (texlive) scheme-basic;
           ## FIXME: figure out why (pkg.tlType == "doc") causes a stack overflow
           #pkgFilter = pkg: pkg.tlType == "run" || pkg.tlType == "bin" || pkg.tlType == "doc";
           #pkgFilter = pkg: pkgs.lib.debug.traceSeq pkg.pname (pkg.tlType == "run" || pkg.tlType == "bin");
@@ -1771,6 +1824,8 @@
         cvs2svn
         cvs_fast_export
         git-lfs
+        git-hub
+        gitAndTools.hub
         gitFull
         git-credential-gnome-keyring
         git-credential-libsecret
