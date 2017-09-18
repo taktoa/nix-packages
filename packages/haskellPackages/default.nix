@@ -145,5 +145,30 @@ with pkgs.haskell.lib;
     };
 
     weeder = self.callPackage ./weeder.nix {};
+
+    smallcheck-lens = doJailbreak super.smallcheck-lens;
+    tasty-lens = doJailbreak super.tasty-lens;
+
+    yi-core            = super.yi-core_0_14_0;
+    yi-frontend-vty    = super.yi-frontend-vty_0_14_0;
+    yi-fuzzy-open      = super.yi-fuzzy-open_0_14_0;
+    yi-ireader         = super.yi-ireader_0_14_0;
+    yi-keymap-cua      = super.yi-keymap-cua_0_14_0;
+    yi-keymap-emacs    = super.yi-keymap-emacs_0_14_0;
+    yi-keymap-vim      = super.yi-keymap-vim_0_14_0;
+    yi-language        = super.yi-language_0_14_0;
+    yi-misc-modes      = super.yi-misc-modes_0_14_0;
+    yi-mode-haskell    = super.yi-mode-haskell_0_14_0;
+    yi-mode-javascript = super.yi-mode-javascript_0_14_0;
+    yi-snippet         = super.yi-snippet_0_14_0;
+
+    quota = self.callCabal2nix "quota" (pkgs.fetchFromGitHub {
+      repo   = "haskell-quota";
+      owner  = "zenhack";
+      rev    = "9f0b67cdba226a0cfe23502e044adce48936a1e6";
+      sha256 = "0bi50addsnxs4wmbn6ybvjldsi01q9ji7m4d3s7ca9visq3n6gvj";
+    }) {};
+
+    hipspec = super.callPackage ./hipspec.nix {};
   };
 }

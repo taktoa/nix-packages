@@ -32,7 +32,7 @@
   allowBroken = true;
 
 
-#<# ┌──────────────────────────┬───────────────────┬───────────────────────────┐
+#<# ┌──────────────────────────┬────d───────────────┬───────────────────────────┐
 #<# ├──────────────────────────┤ Package overrides ├───────────────────────────┤
 #<# └──────────────────────────┴───────────────────┴───────────────────────────┘
 
@@ -45,151 +45,149 @@
 
     nixpkgs-manual = import <nixpkgs/doc>;
 
-    bussard = pkgs.callPackage ./bussard {};
+    bussard = pkgs.callPackage ./packages/bussard {};
 
-    bustle = pkgs.callPackage ./bustle {};
+    bustle = pkgs.callPackage ./packages/bustle {};
 
-    docopt-cpp = pkgs.callPackage ./docopt-cpp {};
+    docopt-cpp = pkgs.callPackage ./packages/docopt-cpp {};
 
-    dparser = pkgs.callPackage ./dparser {};
+    dparser = pkgs.callPackage ./packages/dparser {};
 
     getVersion = k: (builtins.parseDrvName k.name).version;
 
-    utility = pkgs.callPackage ./utility {};
+    utility = pkgs.callPackage ./packages/utility {};
 
-    smackage = pkgs.callPackage ./smackage {};
+    smackage = pkgs.callPackage ./packages/smackage {};
 
-    antlr4 = pkgs.callPackage ./antlr4 {};
+    antlr4 = pkgs.callPackage ./packages/antlr4 {};
 
-    h2o = pkgs.callPackage ./h2o {};
+    h2o = pkgs.callPackage ./packages/h2o {};
 
-    rapidjson = pkgs.callPackage ./rapidjson {};
+    rapidjson = pkgs.callPackage ./packages/rapidjson {};
 
-    googletest = pkgs.callPackage ./googletest {};
+    googletest = pkgs.callPackage ./packages/googletest {};
 
-    lm-math = pkgs.callPackage ./lm-math {};
+    lm-math = pkgs.callPackage ./packages/lm-math {};
 
-    pragmataPro = pkgs.callPackage ./nonfree/pragmata-pro {};
+    pragmataPro = pkgs.callPackage ./packages/nonfree/pragmata-pro {};
 
-    enigma = pkgs.callPackage ./enigma {};
+    enigma = pkgs.callPackage ./packages/enigma {};
 
-    technicLauncher = pkgs.callPackage ./technic-launcher {};
+    technicLauncher = pkgs.callPackage ./packages/technic-launcher {};
 
-    pmd = pkgs.callPackage ./pmd {};
+    pmd = pkgs.callPackage ./packages/pmd {};
 
-    libg15 = pkgs.callPackage ./g15tools/libg15 {};
+    libg15 = pkgs.callPackage ./packages/g15tools/libg15 {};
 
-    libg15render = pkgs.callPackage ./g15tools/libg15render {};
+    libg15render = pkgs.callPackage ./packages/g15tools/libg15render {};
 
-    g15composer = pkgs.callPackage ./g15tools/g15composer {};
+    g15composer = pkgs.callPackage ./packages/g15tools/g15composer {};
 
-    g15daemon = pkgs.callPackage ./g15tools/g15daemon {};
+    g15daemon = pkgs.callPackage ./packages/g15tools/g15daemon {};
 
-    g15macro = pkgs.callPackage ./g15tools/g15macro {};
+    g15macro = pkgs.callPackage ./packages/g15tools/g15macro {};
 
     g15tools = pkgs.buildEnv {
       name = "g15tools";
       paths = with pkgs; [ libg15 libg15render g15composer g15daemon g15macro ];
     };
 
-    logkeys = pkgs.callPackage ./logkeys {};
+    logkeys = pkgs.callPackage ./packages/logkeys {};
 
-    #teamspeak_client = pkgs.qt55.callPackage ./teamspeak/client.nix {};
+    #teamspeak_client = pkgs.qt55.callPackage ./packages/teamspeak/client.nix {};
 
-    fbset = pkgs.callPackage ./fbset {};
+    fbset = pkgs.callPackage ./packages/fbset {};
 
-    languagetool = pkgs.callPackage ./languagetool {};
+    languagetool = pkgs.callPackage ./packages/languagetool {};
 
-    #  guilePackages = pkgs.callPackage ./guilePackages {};
+    #  guilePackages = pkgs.callPackage ./packages/guilePackages {};
 
-    gtick = pkgs.callPackage ./gtick {};
+    gtick = pkgs.callPackage ./packages/gtick {};
 
-    ariamaestosa = pkgs.callPackage ./ariamaestosa {};
+    ariamaestosa = pkgs.callPackage ./packages/ariamaestosa {};
 
-    #obs-studio = pkgs.callPackage ./obs-studio {};
+    #obs-studio = pkgs.callPackage ./packages/obs-studio {};
 
-    mocp-xmobar = pkgs.callPackage ./mocp-xmobar {};
+    mocp-xmobar = pkgs.callPackage ./packages/mocp-xmobar {};
 
-    powerline-fonts = pkgs.callPackage ./powerline-fonts {};
+    powerline-fonts = pkgs.callPackage ./packages/powerline-fonts {};
 
-    maven = pkgs.callPackage ./maven {};
+    maven = pkgs.callPackage ./packages/maven {};
 
-    rust-bindgen = pkgs.callPackage ./rust-bindgen {};
+    rust-bindgen = pkgs.callPackage ./packages/rust-bindgen {};
 
-    matlab = pkgs.callPackage ./nonfree/matlab {
+    matlab = pkgs.callPackage ./packages/nonfree/matlab {
       fileInstallationKey = secret.matlabKey;
       matlabIso = file:///opt/MATLAB-R2015a-Linux64.iso;
-      licensePath = ./include/license.dat;
+      licensePath = ../include/license.dat;
       matlabJDK = pkgs.openjdk8;
       licenseAgreed = true;
     };
 
-    nailgunClient = pkgs.callPackage ./nailgun-client {};
+    nailgunClient = pkgs.callPackage ./packages/nailgun-client {};
 
-    #    kframework = pkgs.callPackage ./kframework {};
+    #    kframework = pkgs.callPackage ./packages/kframework {};
 
-    tinycbor = pkgs.callPackage ./tinycbor {};
-    libcbor = pkgs.callPackage ./libcbor {};
-    herbie = pkgs.callPackage ./herbie {};
+    tinycbor = pkgs.callPackage ./packages/tinycbor {};
+    libcbor = pkgs.callPackage ./packages/libcbor {};
+    herbie = pkgs.callPackage ./packages/herbie {};
 
-    zscreen = pkgs.callPackage ./zscreen {};
+    zscreen = pkgs.callPackage ./packages/zscreen {};
 
-    git-credential-gnome-keyring = pkgs.callPackage ./git-cred-gnome {};
-    git-credential-libsecret = pkgs.callPackage ./git-cred-libsecret {};
+    git-credential-gnome-keyring = pkgs.callPackage ./packages/git-cred-gnome {};
+    git-credential-libsecret = pkgs.callPackage ./packages/git-cred-libsecret {};
 
-    libxcomp = pkgs.callPackage ./libxcomp {};
+    libxcomp = pkgs.callPackage ./packages/libxcomp {};
 
-    xfoil = pkgs.callPackage ./xfoil {};
+    xfoil = pkgs.callPackage ./packages/xfoil {};
 
-    nxproxy = pkgs.callPackage ./nxproxy {};
+    nxproxy = pkgs.callPackage ./packages/nxproxy {};
 
-    x2goclient = pkgs.callPackage ./x2goclient {};
+    x2goclient = pkgs.callPackage ./packages/x2goclient {};
 
-    # netctl = pkgs.callPackage ./netctl {};
+    # netctl = pkgs.callPackage ./packages/netctl {};
 
-    scrape-html = pkgs.callPackage ./scrape-html {};
+    scrape-html = pkgs.callPackage ./packages/scrape-html {};
 
-    chrome-timer = pkgs.callPackage ./chrome-timer {};
+    chrome-timer = pkgs.callPackage ./packages/chrome-timer {};
 
-    miraclecast = pkgs.callPackage ./miraclecast {};
+    miraclecast = pkgs.callPackage ./packages/miraclecast {};
 
-    # pdf2htmlEX = pkgs.callPackage ./pdf2htmlEX {};
+    # pdf2htmlEX = pkgs.callPackage ./packages/pdf2htmlEX {};
 
-    ceta = pkgs.callPackage ./ceta {};
+    ceta = pkgs.callPackage ./packages/ceta {};
 
     maude26 = pkgs.maude;
 
-    maude27 = pkgs.callPackage ./maude {};
+    maude27 = pkgs.callPackage ./packages/maude {};
 
     maude = maude27;
 
-    yakyak = pkgs.callPackage ./yakyak {};
+    yakyak = pkgs.callPackage ./packages/yakyak {};
 
-    cpuchecker = pkgs.callPackage ./cpuchecker {};
+    cpuchecker = pkgs.callPackage ./packages/cpuchecker {};
 
-    journal-notify = pkgs.callPackage ./journal-notify {};
+    journal-notify = pkgs.callPackage ./packages/journal-notify {};
 
-    peek = pkgs.callPackage ./peek {};
-
-    hipspec = pkgs.haskellPackages.callPackage ./hipspec {};
+    peek = pkgs.callPackage ./packages/peek {};
 
     #lxqt = lxqt09;
 
     # lxqt010 = pkgs.recurseIntoAttrs
-    #   (import ./lxqt-0.10 {
+    #   (import ./packages/lxqt-0.10 {
     #      pkgs = pkgs;
     #      newScope = pkgs.newScope;
     #    });
 
     #lxqt09 = pkgs.recurseIntoAttrs
-    #  (import ./lxqt-0.9 {
+    #  (import ./packages/lxqt-0.9 {
     #     pkgs = pkgs;
     #     newScope = pkgs.newScope;
     #   });
 
-    #wpa_supplicant = pkgs.callPackage ./wpa_supplicant {};
+    #wpa_supplicant = pkgs.callPackage ./packages/wpa_supplicant {};
 
-    #qtspim = pkgs.callPackage ./qtspim {};
+    #qtspim = pkgs.callPackage ./packages/qtspim {};
 
     westonRift = pkgs.weston.overrideDerivation (old: {
       src = pkgs.fetchFromGitHub {
@@ -212,8 +210,46 @@
     factorio = pkgs.factorio.override {
       username = "taktoa";
       password = secret.factorioPassword;
+      # mods = (
+      #   with rec {
+      #     modOptions = {
+      #       allRecommendedMods = false;
+      #       allOptionalMods = false;
+      #     };
+      #     makeMod = path: name: pkgs.factorio-utils.modDrv modOptions {
+      #       src = pkgs.stdenv.mkDerivation {
+      #         inherit name;
+      #         src = path;
+      #         phases = [ "unpackPhase" "installPhase" ];
+      #         installPhase = ''
+      #           mkdir -pv "$out"
+      #           cp -rv ./${name} "$out"
+      #         '';
+      #       };
+      #     };
+      #   };
+      #   [
+      #     (makeMod ./packages/nonfree/factorio "bobvehicleequipment_0.15.2.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobenemies_0.15.2.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobtech_0.15.3.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobmining_0.15.2.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobgreenhouse_0.15.2.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobwarfare_0.15.3.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobelectronics_0.15.3.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobrevamp_0.15.4.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobplates_0.15.12.zip")
+      #     (makeMod ./packages/nonfree/factorio "boblocale_0.15.4.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobpower_0.15.4.zip")
+      #     (makeMod ./packages/nonfree/factorio "boblogistics_0.15.6.zip")
+      #     (makeMod ./packages/nonfree/factorio "boblibrary_0.15.8.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobassembly_0.15.7.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobmodules_0.15.3.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobinserters_0.15.1.zip")
+      #     (makeMod ./packages/nonfree/factorio "bobores_0.15.6.zip")
+      #   ]
+      # );
     };
-    
+
     lib = pkgs.stdenv.lib // {
       inherit (builtins) parseDrvName;
 
@@ -393,27 +429,17 @@
       configureFlags = "";
     });
 
-    libtoxcore = pkgs.libtoxcore.overrideDerivation (old: {
-      name = "tox-core-20150511";
-      src = pkgs.fetchFromGitHub {
-        owner  = "irungentoo";
-        repo   = "toxcore";
-        rev    = "b2350f2e26e4fd2c1e9627680663170d94b6d0b8";
-        sha256 = "13pq4vnmgbny4yfsgn2sqybmgwyvakrabsnp89k9whnp5c8jp4q9";
-      };
-    });
+    # libtoxcore = pkgs.libtoxcore.overrideDerivation (old: {
+    #   name = "tox-core-0.1.9";
+    #   src = pkgs.fetchFromGitHub {
+    #     owner  = "TokTok";
+    #     repo   = "c-toxcore";
+    #     rev    = "a429ef4a28a5e5e0ad010efffb76d2abc3ada0af";
+    #     sha256 = "026srkkksa9ccmgrzas8pxqhc2vja3nrxisl64n20x91nwp4fd8k";
+    #   };
+    # });
 
-    aria = aria2;
-    aria2 = pkgs.aria2.overrideDerivation (old: rec {
-      name = "aria2-${version}";
-      version = "1.30.0";
-      src = pkgs.fetchFromGitHub {
-        owner = "aria2";
-        repo = "aria2";
-        rev = "release-${version}";
-        sha256 = "0zm5qnxqafa3ssk48a1iaf8ydwf8r42dd9b09kkyyp9x03yi4xm5";
-      };
-    });
+    linuxPackages_grsec_nixos = null; # fix for `nox` evaluation
 
     chromiumFixed = pkgs.stdenv.mkDerivation {
       name = "chromium-fixed-${(builtins.parseDrvName chromium.name).version}";
@@ -501,7 +527,7 @@
         pkgs.gst_all_1.gstreamer.all
         pkgs.gst_all_1.gst-plugins-base.all
       ];
-      patches = [ ./pocketsphinx/fix-gstreamer-caps.patch ];
+      patches = [ ./packages/pocketsphinx/fix-gstreamer-caps.patch ];
     });
 
     djvulibre_combined = pkgs.djvulibre.overrideDerivation (old: rec {
@@ -585,33 +611,12 @@
 #<# ─────────────────────────┤ Package set overrides ├──────────────────────────
 #<#                          └───────────────────────┘
 
-    # haskellngPackages = pkgs.haskellngPackages.override {
-    #   overrides = selff: superr: {
-    #     hmatrix = superr.hmatrix.override {
-    #       mkDerivation = (attrs: selff.mkDerivation (attrs // { extraLibraries = [ pkgs.openblas ]; configureFlags = [ "-fopenblas" ]; }));
-    #     };
-    #     hmatrix-gsl = superr.hmatrix-gsl.override {
-    #       mkDerivation = (attrs: selff.mkDerivation (attrs // { extraLibraries = [ pkgs.openblas ]; }));
-    #     };
-    #     hmatrix-special = superr.hmatrix-special.override {
-    #       mkDerivation = (attrs: selff.mkDerivation (attrs // { extraLibraries = [ pkgs.openblas ]; }));
-    #     };
-    #   };
-    # };
+    perlPackages = import ./packages/perlPackages { inherit pkgs; };
 
-    perlPackages = pkgs.perlPackages // {
-      GetoptDeclare = pkgs.callPackage ./perlPackages/GetoptDeclare {};
-      TextBalanced  = pkgs.callPackage ./perlPackages/TextBalanced {};
-    };
-
-    # goPackages = pkgs.goPackages // {
-    #   asciinema = pkgs.callPackage ./goPackages/asciinema {};
-    #   color     = pkgs.callPackage ./goPackages/color {};
-    #   pup       = pkgs.callPackage ./goPackages/pup {};
-    # };
+    # goPackages = import ./packages/goPackages { inherit pkgs; };
 
     makeNodePackages = (args:
-      pkgs.callPackage ./nodePackages ({ inherit pkgs; } // args));
+      pkgs.callPackage ./packages/nodePackages ({ inherit pkgs; } // args));
 
     myNodePackages_6_x  = makeNodePackages { nodejs = pkgs.nodejs-6_x;  };
     myNodePackages_5_x  = makeNodePackages { nodejs = pkgs.nodejs-5_x;  };
@@ -621,7 +626,7 @@
     myNodePackages = myNodePackages_4_x;
 
     pythonPackagesGen = (pp:
-      pkgs.callPackage ./pythonPackages {
+      pkgs.callPackage ./packages/pythonPackages {
         inherit pkgs;
         pythonPackages = pp;
       });
@@ -629,7 +634,6 @@
     pypyPackages     = pythonPackagesGen pkgs.pypyPackages;
 
     python27Packages = pythonPackagesGen pkgs.python27Packages;
-    python33Packages = pythonPackagesGen pkgs.python33Packages;
     python34Packages = pythonPackagesGen pkgs.python34Packages;
     python35Packages = pythonPackagesGen pkgs.python35Packages;
 
@@ -658,10 +662,10 @@
     liquidhaskell = liquidHaskellPackages.liquidhaskell;
 
     makeHaskellPackages = (hp: hp.override
-      (import ./haskellPackages/default.nix { inherit pkgs; }));
+      (import ./packages/haskellPackages/default.nix { inherit pkgs; }));
 
     haskellPackages = makeHaskellPackages pkgs.haskellPackages;
-    ghcjsPackages = makeHaskellPackages pkgs.haskell.packages.ghcjs;
+    ghcjsPackages   = makeHaskellPackages pkgs.haskell.packages.ghcjs;
 
     profiledHaskellPackages = pkgs.haskellPackages.override {
       overrides = self: super: {
@@ -673,7 +677,9 @@
 
     hoogleEnabled = true;
 
-    ghcWith = haskellPackages.${if hoogleEnabled then "ghcWithHoogle" else "ghcWithPackages"};
+    ghcWith = (
+      let hp = haskellPackages;
+      in if hoogleEnabled then hp.ghcWithHoogle else hp.ghcWithPackages);
 
     haskellEnv = ({ name, paths }:
       pkgs.buildEnv {
@@ -719,30 +725,27 @@
       };
     };
 
-    ocamlEnv = pkgs.callPackage ./ocamlwrapper;
+    ocamlEnv = pkgs.callPackage ./packages/ocamlwrapper;
 
     # guileEnv = guilePackages.misc.guilewrapper;
 
     buildEnv = pkgs.buildEnv;
 
-    mkEmacsHelpers = emacs: {
-      emacsGTK2 = emacs.override {
+    emacsHelpers = {
+      emacsGTK2 = pkgs.emacs.override {
         withGTK2 = true;
         withGTK3 = false;
         inherit (pkgs) gtk2;
       };
 
-      emacsGTK3 = emacs.override {
+      emacsGTK3 = pkgs.emacs.override {
         withGTK2 = false;
         withGTK3 = true;
         inherit (pkgs) gtk3;
       };
     };
 
-    emacsPackages = pkgs.emacsPackagesNg.override (super: self: rec {
-      emacsHelpers = mkEmacsHelpers pkgs.emacs;
-      emacs = emacsHelpers.emacsGTK3;
-    });
+    emacsPackages = pkgs.emacsPackagesNgGen (emacsHelpers.emacsGTK3);
 
     emacsEnv = ({ name, paths }:
       pkgs.buildEnv {
@@ -760,12 +763,12 @@
     #   };
     # });
 
-    gradle26 = pkgs.callPackage ./gradle26 {};
+    gradle26 = pkgs.callPackage ./packages/gradle26 {};
     gradle = gradle26;
 
-    resume-cli = pkgs.callPackage ./resume-cli {};
+    resume-cli = pkgs.callPackage ./packages/resume-cli {};
 
-    rapidcheck = pkgs.callPackage ./rapidcheck {};
+    rapidcheck = pkgs.callPackage ./packages/rapidcheck {};
 
     gstreamer1 = buildEnv {
       name = "gstreamer1";
@@ -790,14 +793,15 @@
     #      ];
     #    };
 
-    cliPkgs = buildEnv {
-      name = "cliPkgs";
-      paths = with pkgs; [
+    cliPkgs = {
+      inherit (pkgs)
         archivemount
+        aria2
+        axel
         bashInteractive
         bashCompletion
         cdrkit
-        csvkit
+        #csvkit
         cscope
         cv
         docbook2x
@@ -828,6 +832,7 @@
         p7zip
         parallel
         pciutils
+        pdf2djvu
         pixz
         psmisc
         pv
@@ -853,16 +858,15 @@
         w3m
         xcape
         xclip
-        xlibs.xev
         xlsfonts
         zip
-        zsh
-      ];
+        zsh;
+      inherit (pkgs.xlibs)
+        xev;
     };
 
-    devPkgs = buildEnv {
-      name = "devPkgs";
-      paths = with pkgs; [
+    devPkgs = {
+      inherit (pkgs)
         # gcc-arm-embedded
         # androidsdk_4_4
         clang_4
@@ -880,17 +884,12 @@
         include-what-you-use
         llvm
         qemu
-        ncurses
-      ];
-      ignoreCollisions = true;
-      passthru = { meta = { priority = 0; }; };
+        ncurses;
     };
 
-    elmPkgs = buildEnv {
-      name = "elmPkgs";
-      paths = with pkgs.elmPackages; [
-        elm
-      ];
+    elmPkgs = {
+      inherit (pkgs.elmPackages)
+        elm;
     };
 
     emacsPkgs = emacsEnv {
@@ -902,35 +901,30 @@
       ];
     };
 
-    fontPkgs = buildEnv {
-      name = "fontPkgs";
-      paths = with pkgs; [
+    fontPkgs = {
+      inherit (pkgs)
         inconsolata
         pragmataPro
-        powerline-fonts
-      ];
+        powerline-fonts;
     };
 
-    gamePkgs = buildEnv {
-      name = "gamePkgs";
-      paths = with pkgs; [
+    gamePkgs = {
+      inherit (pkgs)
         # enigma
         dwarf_fortress
         technicLauncher
-        the-powder-toy
-      ];
+        the-powder-toy;
     };
 
-    goPkgs = buildEnv {
-      name = "goPkgs";
-      paths = with pkgs; [
-        go asciinema keybase-go
-      ];
+    goPkgs = {
+      inherit (pkgs)
+        go
+        asciinema
+        keybase-go;
     };
 
-    guiPkgs = buildEnv {
-      name = "guiPkgs";
-      paths = with pkgs; [
+    guiPkgs = {
+      inherit (pkgs)
         arandr
         # bustle
         conkeror
@@ -941,7 +935,6 @@
         fbreader
         filezilla
         firefox
-        gnome3.seahorse
         gnumeric
         gsettings_desktop_schemas
         gst-gtklaunch
@@ -958,8 +951,9 @@
         weston
         wpa_supplicant_gui
         # yakyak
-        zeal
-      ];
+        zeal;
+      inherit (pkgs.gnome3)
+        seahorse;
     };
 
     # guilePkgs = guileEnv {
@@ -1140,6 +1134,7 @@
         safe                 #: Safe variants of list and string functions
         data-memocombinators #: Combinators for memoization
         here                 #: String interpolation
+        heredoc              #: String interpolation
         turtle               #: Write scripts in Haskell
         shelly               #: Use Haskell as a scripting language
         shelly-extra         #: Extra stuff for shelly
@@ -1227,7 +1222,7 @@
 
         ### Web data processing
         aeson          #: Parse/render JSON
-        #~aeson-diff   #: Diff JSON
+        aeson-diff     #: Diff JSON
         lens-aeson     #: Law-abiding lenses for aeson
         hjsonschema    #: JSON Schema validator
         html-conduit   #: Parse/render HTML
@@ -1315,22 +1310,29 @@
         daemons                #: Daemons based on pipes
 
         ### Testing
-        HUnit                   #: HUnit is a testing framework for Haskell
-        hspec                   #: Hspec is a testing framework for Haskell
-        hspec-webdriver         #: Hspec support for webdriver
-        hspec-laws              #: Test laws for standard type classes
-        hspec-attoparsec        #: Test your attoparsec parsers with hspec
-        hspec-expectations      #: Hspec combinators
-        hspec-expectations-lens #: Hspec expectations for the lens stuff
-        tasty                   #: A generalized testing framework
-        tasty-rerun             #: Run tests by filtering the test tree
-        tasty-hunit             #: Tasty support for HUnit
-        tasty-hspec             #: Tasty support for Hspec
-        tasty-quickcheck        #: Tasty support for QuickCheck
-        tasty-smallcheck        #: Tasty support for SmallCheck
-        tasty-ant-xml           #: Jenkins output for Tasty
-        doctest                 #: Run examples in documentation as tests
-        fitspec                 #: Evolve functions from examples
+        HUnit                      #: HUnit is a testing framework for Haskell
+        hspec                      #: Hspec is a testing framework for Haskell
+        hspec-webdriver            #: Hspec support for webdriver
+        hspec-laws                 #: Test laws for standard type classes
+        hspec-attoparsec           #: Test your attoparsec parsers with hspec
+        hspec-expectations         #: Hspec combinators
+        hspec-expectations-lens    #: Hspec expectations for the lens stuff
+        tasty                      #: A generalized testing framework
+        tasty-rerun                #: Run tests by filtering the test tree
+        tasty-hunit                #: Tasty support for HUnit
+        tasty-hspec                #: Tasty support for Hspec
+        tasty-quickcheck           #: Tasty support for QuickCheck
+        tasty-smallcheck           #: Tasty support for SmallCheck
+        tasty-ant-xml              #: Jenkins output for Tasty
+        doctest                    #: Run examples in documentation as tests
+        fitspec                    #: Evolve functions from examples
+        tasty-lens                 #: TEMPORARY
+        smallcheck                 #: TEMPORARY
+        smallcheck-series          #: TEMPORARY
+        smallcheck-lens            #: TEMPORARY
+        test-framework             #: TEMPORARY
+        test-framework-hunit       #: TEMPORARY
+        test-framework-quickcheck2 #: TEMPORARY
 
         ### Benchmarking
         criterion #: Benchmarking library for Haskell
@@ -1400,7 +1402,7 @@
         gi-gio            #: GI bindings for GIO
         gi-gobject        #: GI bindings for GObject
         gi-gtk            #: GI bindings for GTK 3
-        gi-javascriptcore #: GI bindings for JavaScriptCore
+        #~gi-javascriptcore #: GI bindings for JavaScriptCore
         gi-gdk            #: GI bindings for GDK
         gi-glib           #: GI bindings for GLib
         gi-pango          #: GI bindings for Pango
@@ -1419,6 +1421,10 @@
         chesshs          #: Parse chess PGN notation
         #~fficxx         #: C++ FFI generator
         #~fficxx-runtime #: C++ FFI generator
+        flow             #: Useful composition operators
+        reinterpret-cast #: Memory reinterpretation casts
+        quota            #: Usage quota monad
+        barrier          #: Generate `shields.io`-style badges
 
         ## -------------------------- Data structures --------------------------
 
@@ -1427,6 +1433,7 @@
         containers           #: General containers
         unordered-containers #: High-performance unordered containers
         ListLike             #: A typeclass for list-like types
+        fingertree           #: Finger trees, interval maps, and priority queues
 
         ### Arrays
         matrix            #: Matrices based on Data.Vector
@@ -1539,23 +1546,21 @@
 
     idrisPkgs = buildEnv {
       name = "idrisPkgs";
-      paths = with pkgs; [
-        (with idrisPackages; with-packages [
+      paths = [
+        (with pkgs.idrisPackages; with-packages [
           base
           prelude
           effects
           contrib
           pruviloj
-          derive
+          # derive
           wl-pprint
         ])
       ];
     };
 
-    javaPkgs = buildEnv {
-      name = "javaPkgs";
-      ignoreCollisions = true;
-      paths = with pkgs; [
+    javaPkgs = {
+      inherit (pkgs)
         # idea.idea-community
         gradle
         groovy
@@ -1563,14 +1568,13 @@
         nailgunClient
         oraclejdk8
         pmd
-        sbt
-      ];
-      passthru = { meta = { priority = 0; }; };
+        sbt;
+      inherit (pkgs.idea)
+        idea-community;
     };
 
-    mediaPkgs = buildEnv {
-      name = "mediaPkgs";
-      paths = with pkgs; [
+    mediaPkgs = {
+      inherit (pkgs)
         ffmpeg
         gimp
         #gtick
@@ -1587,41 +1591,33 @@
         timidity
         vlc
         youtube-dl
-        zscreen
-      ];
+        zscreen;
     };
 
-    miscPkgs = buildEnv {
-      name = "miscPkgs";
-      paths = with pkgs; [
+    miscPkgs = {
+      inherit (pkgs)
         # ihaskell-taktoa
         # kframework
         # matlab
         atk
         jmtpfs
-        libmtp
-      ];
+        libmtp;
     };
 
-    nixPkgs = buildEnv {
-      name = "nixPkgs";
-      paths = with pkgs; [
+    nixPkgs = {
+      inherit (pkgs)
         nix-prefetch-scripts
         nix-repl
         nixbang
         nox
         patchelf
         nixpkgs-lint
-        nixpkgs-manual
-      ];
+        nixpkgs-manual;
     };
 
-    nodePkgs = buildEnv {
-      name = "nodePkgs";
-      paths = with pkgs; [
-        nodejs
-        nodePackages.bower
-      ];
+    nodePkgs = {
+      inherit (pkgs) nodejs;
+      inherit (pkgs.nodePackages) bower;
     };
 
     ocamlPkgs = ocamlEnv {
@@ -1644,19 +1640,17 @@
       ];
     };
 
-    perlPkgs = buildEnv {
-      name = "perlPkgs";
-      paths = with perlPackages; [
-        # pkgs.perl
-        pkgs.pcre
-        pkgs.rakudo
+    perlPkgs = {
+      inherit (pkgs)
+        pcre
+        rakudo;
+
+      inherit (pkgs.perlPackages)
         GetoptDeclare
         TextDiff
         XMLLibXML
         XMLSAX
-        libxml_perl
-      ];
-      passthru = { meta = { priority = 0; }; };
+        libxml_perl;
     };
 
     pythonPkgs = pythonEnv {
@@ -1679,25 +1673,22 @@
       ];
     };
 
-    rustPkgs = buildEnv {
-      name = "rustPkgs";
-      paths = with pkgs; [
-        rust.rustc
-        rust.cargo
+    rustPkgs = {
+      inherit (pkgs.rust)
+        rustc
+        cargo;
+      inherit (pkgs)
         rustfmt
         rustracer
-        rustracerd
-      ];
+        rustracerd;
     };
 
-    smlPkgs = buildEnv {
-      name = "smlPkgs";
-      paths = with pkgs; [
+    smlPkgs = {
+      inherit (pkgs)
         mlton
         polyml
         smlnj
-        smackage
-      ];
+        smackage;
     };
 
     texPkgs = buildEnv {
@@ -1767,9 +1758,8 @@
       ignoreCollisions = true;
     };
 
-    vcsPkgs = buildEnv {
-      name = "vcsPkgs";
-      paths = with pkgs; [
+    vcsPkgs = {
+      inherit (pkgs)
         bazaar
         cvs
         cvsps
@@ -1780,46 +1770,40 @@
         git-credential-gnome-keyring
         git-credential-libsecret
         mercurial
-        subversion
-      ];
+        subversion;
     };
 
     # This package set should be installed with
     #     `nix-env -iA unstable.unstablePkgs`
     # (assuming that you have a nixpkgs unstable channel called "unstable")
-    unstablePkgs = buildEnv {
-      name = "unstablePkgs";
-      paths = with pkgs; [
-      ];
+    unstablePkgs = {
+      inherit (pkgs)
+        ;
     };
 
-    # userPkgs = buildEnv {
-    #   name = "userPkgs";
-    #   paths = with pkgs; [
-    #     cliPkgs
-    #     devPkgs
-    #     emacsPkgs
-    #     fontPkgs
-    #     gamePkgs
-    #     goPkgs
-    #     guiPkgs
-    #     guilePkgs
-    #     haskellPkgs
-    #     javaPkgs
-    #     idrisPkgs
-    #     mediaPkgs
-    #     miscPkgs
-    #     nixPkgs
-    #     nodePkgs
-    #     ocamlPkgs
-    #     perlPkgs
-    #     pythonPkgs
-    #     smlPkgs
-    #     texPkgs
-    #     vcsPkgs
-    #   ];
-
-    #   ignoreCollisions = true;
-    # };
+    userPkgs = {
+      inherit
+        cliPkgs
+        devPkgs
+        emacsPkgs
+        fontPkgs
+        gamePkgs
+        goPkgs
+        guiPkgs
+        #guilePkgs
+        haskellPkgs
+        javaPkgs
+        idrisPkgs
+        mediaPkgs
+        miscPkgs
+        nixPkgs
+        nodePkgs
+        ocamlPkgs
+        perlPkgs
+        pythonPkgs
+        smlPkgs
+        texPkgs
+        vcsPkgs;
+    };
   };
 }
