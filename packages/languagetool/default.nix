@@ -12,10 +12,9 @@ stdenv.mkDerivation rec {
     buildInputs = [ makeWrapper unzip ];
 
     installPhase = ''
-        mkdir -p $out/bin
-        cp -R * $out/
-        cp languagetool-*.jar $out
-        makeWrapper ${jdk}/bin/java $out/bin/languagetool \
-          --add-flags "-jar $out/languagetool-commandline.jar"
+      mkdir -p "$out/bin" "$out/share/languagetool"
+      cp -R ./* "$out/share/languagetool"
+      makeWrapper ${jdk}/bin/java "$out/bin/languagetool" \
+        --add-flags "-jar $out/share/languagetool/languagetool-commandline.jar"
     '';
 }

@@ -1,0 +1,18 @@
+diff --git a/Data/Array/Accelerate/Numeric/Sum/LLVM/Prim.hs b/Data/Array/Accelerate/Numeric/Sum/LLVM/Prim.hs
+index e282511..95d336b 100644
+--- a/Data/Array/Accelerate/Numeric/Sum/LLVM/Prim.hs
++++ b/Data/Array/Accelerate/Numeric/Sum/LLVM/Prim.hs
+@@ -75,9 +75,9 @@ instr ty ins = do
+   return (LocalReference ty name)
+ 
+ upcast :: FloatingType t -> Operand -> IR t
+-upcast TypeFloat{}   (LocalReference (FloatingPointType FloatFP)  (UnName x)) = IR $ OP_Float   (A.LocalReference A.type' (A.UnName x))
+-upcast TypeDouble{}  (LocalReference (FloatingPointType DoubleFP) (UnName x)) = IR $ OP_Double  (A.LocalReference A.type' (A.UnName x))
+-upcast TypeCFloat{}  (LocalReference (FloatingPointType FloatFP)  (UnName x)) = IR $ OP_CFloat  (A.LocalReference A.type' (A.UnName x))
+-upcast TypeCDouble{} (LocalReference (FloatingPointType DoubleFP) (UnName x)) = IR $ OP_CDouble (A.LocalReference A.type' (A.UnName x))
++upcast TypeFloat{}   (LocalReference (FloatingPointType 32 IEEE) (UnName x)) = IR $ OP_Float   (A.LocalReference A.type' (A.UnName x))
++upcast TypeDouble{}  (LocalReference (FloatingPointType 64 IEEE) (UnName x)) = IR $ OP_Double  (A.LocalReference A.type' (A.UnName x))
++upcast TypeCFloat{}  (LocalReference (FloatingPointType 32 IEEE) (UnName x)) = IR $ OP_CFloat  (A.LocalReference A.type' (A.UnName x))
++upcast TypeCDouble{} (LocalReference (FloatingPointType 64 IEEE) (UnName x)) = IR $ OP_CDouble (A.LocalReference A.type' (A.UnName x))
+ upcast _ _ = $internalError "upcast" "expected local reference"
+ 

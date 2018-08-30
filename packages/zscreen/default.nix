@@ -18,8 +18,10 @@ in stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner  = "ChrisZeta";
     repo   = "Scrot-and-imgur-zenity-GUI";
-    rev    = "9b56d3bd734305605323d75a5a89de07dee30e1c";
-    sha256 = "1mwairmd5zkh85ks772zrnm4inzb981psgk7z26dad65m8305vx1";
+    rev    = "e9d15e606a0d358f002d0ec45324069c5cff3c68";
+    sha256 = "1smllnmskrwzdai120krxvgh5bb1qpdwvgphp44dbd9jkcnr7ycz";
+    # rev    = "9b56d3bd734305605323d75a5a89de07dee30e1c";
+    # sha256 = "1mwairmd5zkh85ks772zrnm4inzb981psgk7z26dad65m8305vx1";
     # owner  = "taktoa";
     # repo   = "zscreen-ng";
     # rev    = "9b56d3bd734305605323d75a5a89de07dee30e1c";
@@ -32,8 +34,8 @@ in stdenv.mkDerivation rec {
     
   installPhase = ''
     install -Dm755 src/zscreen.sh "$out/bin/zscreen"
+    install -Dm755 src/zimgur.sh  "$out/bin/zimgur"
     wrapProgram $out/bin/zscreen --suffix PATH : "$PATH_ADD"
-    ln -s ${imgur-screenshot}/bin/imgur-screenshot "$out/bin/zimgur"
   '';
   
   meta = {

@@ -6,61 +6,82 @@ with pythonPackages;
 
 with { inherit (pkgs) lib; };
 
-let removeNulls = lib.filterAttrs (n: v: v != null);
-    srcHelper = url: sha256: curlOpts: name:
-      assert url != null;
-      assert sha256 != null;
-      pkgs.fetchurl (removeNulls { inherit url sha256 name curlOpts; });
+with rec {
+  removeNulls = lib.filterAttrs (n: v: v != null);
 
-    mkPython =
-      { packageName            # < A package name.
-      , version                # < A package version.
-      , srcURL          ? null # < A url to download from.
-      , srcSHA          ? null # < A SHA256 checksum for the download.
-      , srcName         ? null # < A name for the downloaded file.
-      , srcCurlOpts     ? null # < A curl options for the download.
-      , src             ? null # < A source to use (overrides other options).
-      , buildDeps       ? []   # < Build dependencies to add.
-      , propDeps        ? []   # < Propagated dependencies to add.
-      , nativeBuildDeps ? []   # < Native build dependencies to add.
-      , nativePropDeps  ? []   # < Native propagated dependencies to add.
-      # The following attributes are equivalent to those in meta:
-      , homepage        ? null # < A homepage of the project.
-      , description     ? null # < A description.
-      , longDescription ? null # < A longer description.
-      , maintainers     ? null # < A list of maintainers.
-      , license         ? null # < A license.
-      , platforms       ? null # < A list of supported platforms.
-      , ... # Any other options will be passed to buildPythonPackage directly
-      } @ args:
+  srcHelper = url: sha256: curlOpts: name: (
+    assert url != null;
+    assert sha256 != null;
+    pkgs.fetchurl (removeNulls { inherit url sha256 name curlOpts; }));
 
-      buildPythonPackage (removeNulls ({
-        name = "${packageName}-${version}";
+  mkPython = (
+    { packageName,            # < A package name.
+      version,                # < A package version.
+      srcURL          ? null, # < A url to download from.
+      srcSHA          ? null, # < A SHA256 checksum for the download.
+      srcName         ? null, # < A name for the downloaded file.
+      srcCurlOpts     ? null, # < A curl options for the download.
+      src             ? null, # < A source to use (overrides other options).
+      buildDeps       ? [],   # < Build dependencies to add.
+      propDeps        ? [],   # < Propagated dependencies to add.
+      nativeBuildDeps ? [],   # < Native build dependencies to add.
+      nativePropDeps  ? [],   # < Native propagated dependencies to add.
+      # The following attributes are propagated to the `meta` attribute:
+      homepage        ? null, # < A homepage of the project.
+      description     ? null, # < A description.
+      longDescription ? null, # < A longer description.
+      maintainers     ? null, # < A list of maintainers.
+      license         ? null, # < A license.
+      platforms       ? null, # < A list of supported platforms.
+      ... # Any other options will be passed to buildPythonPackage directly
+    } @ args:
 
-        src = if isNull src
-              then srcHelper srcURL srcSHA srcCurlOpts srcName
-              else src;
+    buildPythonPackage (removeNulls ({
+      name = "${packageName}-${version}";
 
-        buildInputs           = buildDeps;
-        propagatedBuildInputs = propDeps;
+      src = if isNull src
+        then srcHelper srcURL srcSHA srcCurlOpts srcName
+        else src;
 
-        nativeBuildInputs           = nativeBuildDeps;
-        propagatedNativeBuildInputs = nativePropDeps;
+      buildInputs           = buildDeps;
+      propagatedBuildInputs = propDeps;
 
-        meta = removeNulls {
-          inherit homepage description longDescription
-                  license maintainers platforms;
-        };
-      } // args));
-   isNonEmptyString = x: stringLength x > 0;
-   strHead = x: (assert isNonEmptyString x; substring 0 1 x);
-   pypiURL = name: version:
-     assert isNonEmptyString name;
-     assert isNonEmptyString version;
-     "mirror://pypi/${strHead name}/${name}/${name}-${version}.tar.gz";
+      nativeBuildInputs           = nativeBuildDeps;
+      propagatedNativeBuildInputs = nativePropDeps;
 
-in pythonPackages // (rec {
+      meta = removeNulls {
+        inherit homepage;
+        inherit description;
+        inherit longDescription;
+        inherit license;
+        inherit maintainers;
+        inherit platforms;
+      };
+    } // args)));
+
+  isNonEmptyString = x: stringLength x > 0;
+  strHead = x: (assert isNonEmptyString x; substring 0 1 x);
+  pypiURL = name: version: (
+    assert isNonEmptyString name;
+    assert isNonEmptyString version;
+    "mirror://pypi/${strHead name}/${name}/${name}-${version}.tar.gz");
+};
+
+pythonPackages // (rec {
   # bobbuilder = pkgs.callPackage ./bobbuilder {};
+
+  meson = mkPython (rec {
+    packageName  = "meson";
+    version      = "0.42.1";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "1phf1xpwm8m85qiiirkqhrf5aigx7ajaw0l59d6lzadf1fmgfx5v";
+    propDeps     = [];
+    homepage     = "http://mesonbuild.com";
+    description  = "A fast, easy-to-use, cross-platform build system";
+    license      = with lib.licenses; [ asl20.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+  });
 
   gst-gtklaunch = mkPython (rec {
     packageName = "gst-gtklaunch";
@@ -131,9 +152,9 @@ in pythonPackages // (rec {
     srcURL       = pypiURL packageName version;
     srcSHA       = "1k6ha8x3abwdgqixlcn7a1hd6l7jmxxrc8w4bh06byfvgi61nkih";
     propDeps     = with pkgs; [
-                     python-djvulibre PyICU lxml html5lib pillow nose
-                     libxml2 glibcLocales
-                   ];
+      python-djvulibre PyICU lxml html5lib pillow nose
+      libxml2 glibcLocales
+    ];
     homepage     = "https://jwilk.net/software/ocrodjvu";
     description  = "A program that allows you to perform OCR on DjVu files";
     license      = with lib.licenses; [ gpl2.spdxId ];
@@ -141,31 +162,31 @@ in pythonPackages // (rec {
     platforms    = with lib.platforms; all;
   });
 
-  typed-ast = mkPython (rec {
-    packageName  = "typed-ast";
-    version      = "0.5.3";
-    srcURL       = pypiURL packageName version;
-    srcSHA       = "0ybssbjbmx311w9jyix1ig9kkhn85n1yy0br1sa8ipp9ajgs8dcn";
-    propDeps     = with pkgs; [];
-    homepage     = "https://github.com/dropbox/typed_ast";
-    description  = "A typed AST for Python";
-    license      = with lib.licenses; [ asl20.spdxId ];
-    maintainers  = with lib.maintainers; [ taktoa ];
-    platforms    = with lib.platforms; all;
-  });
+  # typed-ast = mkPython (rec {
+  #   packageName  = "typed-ast";
+  #   version      = "0.5.3";
+  #   srcURL       = pypiURL packageName version;
+  #   srcSHA       = "0ybssbjbmx311w9jyix1ig9kkhn85n1yy0br1sa8ipp9ajgs8dcn";
+  #   propDeps     = with pkgs; [];
+  #   homepage     = "https://github.com/dropbox/typed_ast";
+  #   description  = "A typed AST for Python";
+  #   license      = with lib.licenses; [ asl20.spdxId ];
+  #   maintainers  = with lib.maintainers; [ taktoa ];
+  #   platforms    = with lib.platforms; all;
+  # });
 
-  mypy-lang = mkPython (rec {
-    packageName  = "mypy-lang";
-    version      = "0.4.1";
-    srcURL       = pypiURL packageName version;
-    srcSHA       = "0xqvp88fmjbykjdcp0a2smlnmhsqz8m6x96drc34v9bkqms29vhw";
-    propDeps     = with pkgs; [ typed-ast ];
-    homepage     = "http://mypy-lang.org";
-    description  = "Experimental static types for Python";
-    license      = with lib.licenses; [ mit.spdxId ];
-    maintainers  = with lib.maintainers; [ taktoa ];
-    platforms    = with lib.platforms; all;
-  });
+  # mypy-lang = mkPython (rec {
+  #   packageName  = "mypy-lang";
+  #   version      = "0.4.1";
+  #   srcURL       = pypiURL packageName version;
+  #   srcSHA       = "0xqvp88fmjbykjdcp0a2smlnmhsqz8m6x96drc34v9bkqms29vhw";
+  #   propDeps     = with pkgs; [ typed-ast ];
+  #   homepage     = "http://mypy-lang.org";
+  #   description  = "Experimental static types for Python";
+  #   license      = with lib.licenses; [ mit.spdxId ];
+  #   maintainers  = with lib.maintainers; [ taktoa ];
+  #   platforms    = with lib.platforms; all;
+  # });
 
   piazza-api = mkPython (rec {
     packageName  = "piazza-api";
@@ -173,9 +194,9 @@ in pythonPackages // (rec {
     srcURL       = pypiURL packageName version;
     srcSHA       = "0w3pkxx4b8rh82qqzl9nag4r8dmc5nbngf3afjlml5dmbgjpv23z";
     propDeps     = with pkgs; [
-                     blockdiag docutils reportlab
-                     pep8 nose pip pillow requests
-                   ];
+      blockdiag docutils reportlab
+      pep8 nose pip pillow requests
+    ];
     homepage     = "https://github.com/hfaran/piazza-api";
     description  = "An unofficial client for Piazza's internal API";
     licenses     = with lib.licenses; [ mit.spdxId ];
@@ -229,7 +250,7 @@ in pythonPackages // (rec {
     srcSHA       = "1i8jm0sijlivak4rmhdan51w2mhz3h55xg7jcvlsz1zc8hz5mkw3";
     propDeps     = with pkgs; [ simpleparse urwid ];
     homepage     = "http://robla.net/jsonwidget";
-    description  = "A general-purpose JSON validation and manipulation, and form-building library.";
+    description  = "JSON validation and manipulation, and form-building.";
     license      = with lib.licenses; [ lgpl21.spdxId ];
     maintainers  = with lib.maintainers; [ taktoa ];
     platforms    = with lib.platforms; all;
@@ -283,5 +304,158 @@ in pythonPackages // (rec {
     maintainers  = with lib.maintainers; [ taktoa ];
     platforms    = with lib.platforms; all;
     doCheck      = false;
+  });
+
+  aggdraw-64bits = mkPython (rec {
+    packageName  = "aggdraw";
+    version      = "1.1";
+    src          = pkgs.fetchFromGitHub {
+                     owner  = "scottopell";
+                     repo   = "aggdraw-64bits";
+                     rev    = "c95aac4369038706943fd0effb7d888683860e5a";
+                     sha256 = "12vr170vlnx2a1gq2w5dg76rv7xsp4gvan2ggzlxkmwsppls867d";
+                   };
+    propDeps     = [];
+    homepage     = "https://github.com/scottopell/aggdraw-64bits";
+    description  = "64 bit variant of the aggdraw graphics engine for PIL.";
+    license      = with lib.licenses; [ mit.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+  });
+
+  pykwalify = mkPython (rec {
+    packageName  = "pykwalify";
+    version      = "1.6.0";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "0i7q5ynad0j84aba3fj2ayfp9pbj1n6inapn6lc1cs6whkzgm612";
+    propDeps     = [ pyyaml dateutil docopt testfixtures pytest ];
+    homepage     = "https://github.com/Grokzen/pykwalify";
+    description  = "YAML/JSON validation library.";
+    license      = with lib.licenses; [ mit.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+  });
+
+  pydotplus = mkPython (rec {
+    packageName  = "pydotplus";
+    version      = "2.0.2";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "1i05cnk3yh722fdyaq0asr7z9xf7v7ikbmnpxa8j6pdqx6g5xs4i";
+    propDeps     = [ pyparsing ];
+    homepage     = "https://github.com/carlos-jenkins/pydotplus";
+    description  = "A python interface to the graphviz dot language.";
+    license      = with lib.licenses; [ mit.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+  });
+
+  cppdep = mkPython (rec {
+    packageName  = "cppdep";
+    version      = "0.2.4";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "0nz53v7alw6h5r2agnqd15m1q4036kiqalkcgfzcwwyyawpqphm1";
+    propDeps     = [ pyyaml pykwalify networkx pydot pydotplus ];
+    homepage     = "https://github.com/rakhimov/cppdep";
+    description  = "C++ dependency analysis tool.";
+    license      = with lib.licenses; [ gpl3Plus.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+  });
+
+  python-socketio = mkPython (rec {
+    packageName  = "python-socketio";
+    version      = "1.8.4";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "1k12l4xdbvx3acrj7z5m3sx0s75c3wxs958jncaisdw5gvhpr00k";
+    propDeps     = [ six python-engineio ];
+    doCheck      = false;
+  });
+
+  python-engineio = mkPython (rec {
+    packageName  = "python-engineio";
+    version      = "2.0.1";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "0c1ccz6fp783ppwwbsgm20i9885fqzyhdvsq6j3nqmyl9q6clvr6";
+    propDeps     = [ six eventlet greenlet mock enum-compat pbr ];
+    doCheck      = false;
+  });
+
+  flask-socketio = mkPython (rec {
+    packageName  = "Flask-SocketIO";
+    version      = "2.9.3";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "0nbdljbr2x8fcl2zd8d4amlwyhn32m91cm0bpm1waac5vf8gf8yz";
+    propDeps     = [ flask python-socketio coverage ];
+    doCheck      = false;
+  });
+
+  pypugjs = mkPython (rec {
+    packageName  = "pypugjs";
+    version      = "4.2.2";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "137cyrilkq1c9grx1y7axvgfqr4qkx46p6ipjhnldnb6hykp56n9";
+    propDeps     = [ six pyramid Mako tornado django ];
+    doCheck      = false;
+  });
+
+  pygdbmi = mkPython (rec {
+    packageName  = "pygdbmi";
+    version      = "0.8.0.0";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "15ba8qhdakqfyfn9z92qmihrk7m3kiac5884gx8dljlxl466g0gb";
+    propDeps     = [ ];
+    doCheck      = false;
+  });
+
+  gdbgui = mkPython (rec {
+    packageName  = "gdbgui";
+    version      = "0.9.1.1";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "14cv30jip1hx8vapfs07mbdj604np4hqgb3w0kb9ddfwr72xsa4y";
+    propDeps     = [ flask flask-compress flask-socketio
+                     pygments eventlet gevent pypugjs pygdbmi ];
+    homepage     = "https://github.com/cs01/gdbgui";
+    description  = "Browser-based GUI frontend for GDB.";
+    license      = with lib.licenses; [ gpl3Plus.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+  });
+  
+  decorating = mkPython (rec {
+    packageName  = "decorating";
+    version      = "0.6.1";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "10s8fg9pm4aq88giq98c0rqa6r7pv622x3ywncq1anih1brxyvkn";
+    propDeps     = [ ];
+    homepage     = "https://github.com/ryukinix/mal";
+    description  = "A useful collection of decorators.";
+    license      = with lib.licenses; [ mit.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+  });
+
+  mal = mkPython (rec {
+    packageName  = "mal";
+    version      = "2018-03-01";
+    src          = pkgs.fetchFromGitHub {
+                     owner  = "ryukinix";
+                     repo   = "mal";
+                     rev    = "4930bc69ed471691df90e9da8ccd41409f21f989";
+                     sha256 = "00l1vljzvhv4a42mljvl02dkn2jgjd19845c973hxc5m8p5c06xc";
+                   };
+    propDeps     = [ appdirs requests decorating ];
+    homepage     = "https://github.com/ryukinix/mal";
+    description  = "Command-line interface to the MyAnimeList API.";
+    license      = with lib.licenses; [ gpl3Plus.spdxId ];
+    maintainers  = with lib.maintainers; [ taktoa ];
+    platforms    = with lib.platforms; all;
+  });
+
+  sphinxcontrib-matlabdomain = mkPython (rec {
+    packageName  = "sphinxcontrib-matlabdomain";
+    version      = "0.3.0";
+    srcURL       = pypiURL packageName version;
+    srcSHA       = "14jkz2m7ydy1siapksv89jb6pfsyaamz2qr4cl315i3i59s0qvf1";
+    propDeps     = [ sphinx pygments future ];
   });
 })

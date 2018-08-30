@@ -1,0 +1,13 @@
+diff --git a/src/linenoise/linenoise.cpp b/src/linenoise/linenoise.cpp
+index c57505d2..30834968 100644
+--- a/src/linenoise/linenoise.cpp
++++ b/src/linenoise/linenoise.cpp
+@@ -1933,7 +1933,7 @@ static int cleanupCtrl(int c) {
+ }
+ 
+ // break characters that may precede items to be completed
+-static const char breakChars[] = " =+-/\\*?\"'`&<>;|@{([])}";
++static const char breakChars[] = " =+/\\*?\"'`&<>;|@{([])}";
+ 
+ // maximum number of completions to display without asking
+ static const size_t completionCountCutoff = 100;

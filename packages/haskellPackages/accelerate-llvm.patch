@@ -1,0 +1,86 @@
+diff --git a/accelerate-llvm-native/accelerate-llvm-native.cabal b/accelerate-llvm-native/accelerate-llvm-native.cabal
+index d0964794..2bcc047c 100644
+--- a/accelerate-llvm-native/accelerate-llvm-native.cabal
++++ b/accelerate-llvm-native/accelerate-llvm-native.cabal
+@@ -142,8 +142,8 @@ Library
+         , ghc
+         , hashable                      >= 1.0
+         , libffi                        >= 0.1
+-        , llvm-hs                       >= 4.1 && < 6.1
+-        , llvm-hs-pure                  >= 4.1 && < 6.1
++        , llvm-hs                       >= 4.1 && < 6.3
++        , llvm-hs-pure                  >= 4.1 && < 6.3
+         , lockfree-queue                >= 0.2
+         , mtl                           >= 2.2.1
+         , template-haskell
+diff --git a/accelerate-llvm-ptx/accelerate-llvm-ptx.cabal b/accelerate-llvm-ptx/accelerate-llvm-ptx.cabal
+index 2ff4ae31..9bace618 100644
+--- a/accelerate-llvm-ptx/accelerate-llvm-ptx.cabal
++++ b/accelerate-llvm-ptx/accelerate-llvm-ptx.cabal
+@@ -153,8 +153,8 @@ Library
+         , file-embed                    >= 0.0.8
+         , filepath                      >= 1.0
+         , hashable                      >= 1.2
+-        , llvm-hs                       >= 4.1 && < 6.1
+-        , llvm-hs-pure                  >= 4.1 && < 6.1
++        , llvm-hs                       >= 4.1 && < 6.3
++        , llvm-hs-pure                  >= 4.1 && < 6.3
+         , mtl                           >= 2.2.1
+         , nvvm                          >= 0.7.5
+         , pretty                        >= 1.1
+diff --git a/accelerate-llvm/accelerate-llvm.cabal b/accelerate-llvm/accelerate-llvm.cabal
+index 19e961bd..3f0e8ca5 100644
+--- a/accelerate-llvm/accelerate-llvm.cabal
++++ b/accelerate-llvm/accelerate-llvm.cabal
+@@ -156,8 +156,8 @@ Library
+         , dlist                         >= 0.6
+         , exceptions                    >= 0.6
+         , filepath                      >= 1.0
+-        , llvm-hs                       >= 4.1 && < 6.1
+-        , llvm-hs-pure                  >= 4.1 && < 6.1
++        , llvm-hs                       >= 4.1 && < 6.3
++        , llvm-hs-pure                  >= 4.1 && < 6.3
+         , mtl                           >= 2.0
+         , template-haskell
+         , unordered-containers          >= 0.2
+diff --git a/accelerate-llvm/src/LLVM/AST/Type/Metadata.hs b/accelerate-llvm/src/LLVM/AST/Type/Metadata.hs
+index dda0038e..f49a4a33 100644
+--- a/accelerate-llvm/src/LLVM/AST/Type/Metadata.hs
++++ b/accelerate-llvm/src/LLVM/AST/Type/Metadata.hs
+@@ -1,3 +1,5 @@
++{-# LANGUAGE CPP                   #-}
++{-# LANGUAGE FlexibleInstances     #-}
+ {-# LANGUAGE GADTs                 #-}
+ {-# LANGUAGE MultiParamTypeClasses #-}
+ {-# OPTIONS_HADDOCK hide #-}
+@@ -43,7 +45,16 @@ instance Downcast Metadata LLVM.Metadata where
+   downcast (MetadataConstantOperand o) = LLVM.MDValue (LLVM.ConstantOperand o)
+   downcast (MetadataNodeOperand n)     = LLVM.MDNode (downcast n)
+ 
++#if MIN_VERSION_llvm_hs_pure(6,1,0)
++instance Downcast MetadataNode (LLVM.MDRef LLVM.MDNode) where
++  downcast (MetadataNode n)            = LLVM.MDInline (downcast n)
++  downcast (MetadataNodeReference r)   = LLVM.MDRef r
++
++instance Downcast [Maybe Metadata] LLVM.MDNode where
++  downcast = LLVM.MDTuple . map downcast
++#else
+ instance Downcast MetadataNode LLVM.MetadataNode where
+   downcast (MetadataNode n)            = LLVM.MetadataNode (downcast n)
+   downcast (MetadataNodeReference r)   = LLVM.MetadataNodeReference r
++#endif
+ 
+diff --git a/stack-8.4.yaml b/stack-8.4.yaml
+index e7193a19..1ae4187e 100644
+--- a/stack-8.4.yaml
++++ b/stack-8.4.yaml
+@@ -1,7 +1,7 @@
+ # For more information, see: https://github.com/commercialhaskell/stack/blob/release/doc/yaml_configuration.md
+ # vim: nospell
+ 
+-resolver: nightly-2018-05-02
++resolver: nightly-2018-05-15
+ 
+ packages:
+ - 'accelerate-llvm'
+

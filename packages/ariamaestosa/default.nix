@@ -1,48 +1,63 @@
-{ stdenv
-, fetchurl
-, scons
-, wxGTK30
-, pkgconfig
-, glib
-, python
-, gnome3
-, alsaLib
+{ stdenv, fetchFromGitHub, scons, pkgconfig
+, python, wxGTK30, glib, gnome3, alsaLib, rtmidi
 }:
 
-stdenv.mkDerivation rec {
+let wxGTKwithWebKit = wxGTK30.override { withWebKit = true; };
+in stdenv.mkDerivation rec {
   pkgName = "ariamaestosa";
-  version = "1.4.10";
+  version = "1.4.13";
   name = "${pkgName}-${version}";
+
+  src = fetchFromGitHub {
+    repo   = "ariamaestosa";
+    owner  = "taktoa";
+    rev    = "46bd8f22e0f3ea252c87f9e9191da12b9017091d";
+    sha256 = "1b7s172msd6pvkwchyks2b295iz739dhag59h0bh6fgw2vcbn5as";
+  };
 
   buildInputs = [
     scons
-    wxGTK30
+    wxGTKwithWebKit
     pkgconfig
     glib
     python
     gnome3.gtk
-    alsaLib
+    alsaLib.out
+    alsaLib.dev
+    rtmidi
+    # jdksmidi
   ];
 
-  patches = [ ./fix-pkg-config-path.patch ];
-
-  configurePhase = "";
+  configurePhase = ''
+    printf 'install:\n\techo DONE\n' > Makefile
+  '';
 
   buildPhase = ''
-      scons prefix=$out CXXFLAGS="$NIX_CFLAGS_COMPILE" LDFLAGS="$NIX_LDFLAGS"
-      
-      exit -1
-  '';
-  
-  src = fetchurl {
-    url = "mirror://sourceforge/${pkgName}/${pkgName}/${version}/AriaSrc-${version}.tar.bz2";
-    sha256 = "1xjj1z6akm81cinmkj7amjb5c5a71dp2bkrbziiklq9d07aq911l";
-  };
+    mkdir -p "$out"
 
-  meta = {
+    SCONS_CXXFLAGS=""
+    SCONS_CXXFLAGS="$SCONS_CXXFLAGS $NIX_CFLAGS_COMPILE"
+    SCONS_CXXFLAGS="$SCONS_CXXFLAGS -I${alsaLib.dev}/include"
+
+    SCONS_LDFLAGS=""
+    SCONS_LDFLAGS="$SCONS_LDFLAGS $(echo "$NIX_LDFLAGS" | sed 's/-rpath /-Wl,-rpath=/g')"
+    SCONS_LDFLAGS="$SCONS_LDFLAGS -L${wxGTKwithWebKit}/lib"
+
+    scons install                  \
+        config=release             \
+        prefix=$out                \
+        compiler_arch=64bit        \
+        CXXFLAGS="$SCONS_CXXFLAGS" \
+        LDFLAGS="$SCONS_LDFLAGS"   \
+        -j "$NIX_BUILD_CORES"
+  '';
+
+  installPhase = "";
+
+  meta = with stdenv.lib; {
     description = "Aria Maestosa is an open-source MIDI sequencer/editor";
-    homepage = http://ariamaestosa.sourceforge.net;
-    license = stdenv.lib.licenses.gpl2;
-    platforms = stdenv.lib.platforms.all;
+    homepage    = "http://ariamaestosa.sourceforge.net";
+    license     = licenses.gpl2;
+    platforms   = platforms.linux;
   };
 }

@@ -1,0 +1,131 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0263457..f66ec82 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,11 +1,48 @@
+-cmake_minimum_required (VERSION 2.6) 
+-project (JDKSMIDI)
++cmake_minimum_required(VERSION 2.6)
++project(JDKSMIDI)
+ 
+-include_directories( ${JDKSMIDI_SOURCE_DIR}/include )
++set(JDKSMIDI_VERSION "1.0")
+ 
+-add_library (jdksmidi src/jdksmidi_advancedsequencer.cpp src/jdksmidi_driver.cpp src/jdksmidi_driverdump.cpp src/jdksmidi_edittrack.cpp src/jdksmidi_file.cpp src/jdksmidi_fileread.cpp src/jdksmidi_filereadmultitrack.cpp src/jdksmidi_fileshow.cpp src/jdksmidi_filewrite.cpp src/jdksmidi_filewritemultitrack.cpp src/jdksmidi_keysig.cpp src/jdksmidi_manager.cpp src/jdksmidi_matrix.cpp src/jdksmidi_midi.cpp src/jdksmidi_msg.cpp src/jdksmidi_multitrack.cpp src/jdksmidi_parser.cpp src/jdksmidi_process.cpp src/jdksmidi_queue.cpp src/jdksmidi_sequencer.cpp src/jdksmidi_showcontrol.cpp src/jdksmidi_showcontrolhandler.cpp src/jdksmidi_smpte.cpp src/jdksmidi_sysex.cpp src/jdksmidi_tempo.cpp src/jdksmidi_tick.cpp src/jdksmidi_track.cpp src/jdksmidi_utils.cpp)
++# From https://stackoverflow.com/a/7216542
++function(join VALUES GLUE OUTPUT)
++  string (REGEX REPLACE "([^\\]|^);" "\\1${GLUE}" _TMP_STR "${VALUES}")
++  string (REGEX REPLACE "[\\](.)" "\\1" _TMP_STR "${_TMP_STR}") # fixes escaping
++  set (${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
++endfunction()
+ 
+-link_directories( ${JDKSMIDI_BINARY_DIR} )
++include_directories(${JDKSMIDI_SOURCE_DIR}/include)
++
++add_library(jdksmidi
++  src/jdksmidi_advancedsequencer.cpp
++  src/jdksmidi_driver.cpp
++  src/jdksmidi_driverdump.cpp
++  src/jdksmidi_edittrack.cpp
++  src/jdksmidi_file.cpp
++  src/jdksmidi_fileread.cpp
++  src/jdksmidi_filereadmultitrack.cpp
++  src/jdksmidi_fileshow.cpp
++  src/jdksmidi_filewrite.cpp
++  src/jdksmidi_filewritemultitrack.cpp
++  src/jdksmidi_keysig.cpp
++  src/jdksmidi_manager.cpp
++  src/jdksmidi_matrix.cpp
++  src/jdksmidi_midi.cpp
++  src/jdksmidi_msg.cpp
++  src/jdksmidi_multitrack.cpp
++  src/jdksmidi_parser.cpp
++  src/jdksmidi_process.cpp
++  src/jdksmidi_queue.cpp
++  src/jdksmidi_sequencer.cpp
++  src/jdksmidi_showcontrol.cpp
++  src/jdksmidi_showcontrolhandler.cpp
++  src/jdksmidi_smpte.cpp
++  src/jdksmidi_sysex.cpp
++  src/jdksmidi_tempo.cpp
++  src/jdksmidi_tick.cpp
++  src/jdksmidi_track.cpp
++  src/jdksmidi_utils.cpp)
++
++link_directories(${JDKSMIDI_BINARY_DIR})
+ 
+ add_executable(create_midifile examples/create_midifile.cpp)
+ target_link_libraries(create_midifile jdksmidi)
+@@ -37,4 +74,55 @@ target_link_libraries(rewrite_midifile jdksmidi)
+ add_executable(vrm_music_gen examples/vrm_music_gen.cpp)
+ target_link_libraries(vrm_music_gen jdksmidi)
+ 
++set(headers
++  "include/jdksmidi/advancedsequencer.h"
++  "include/jdksmidi/edittrack.h"
++  "include/jdksmidi/fileshow.h"
++  "include/jdksmidi/manager.h"
++  "include/jdksmidi/multitrack.h"
++  "include/jdksmidi/sequencer.h"
++  "include/jdksmidi/song.h"
++  "include/jdksmidi/track.h"
++  "include/jdksmidi/driverdump.h"
++  "include/jdksmidi/file.h"
++  "include/jdksmidi/filewrite.h"
++  "include/jdksmidi/matrix.h"
++  "include/jdksmidi/parser.h"
++  "include/jdksmidi/showcontrol.h"
++  "include/jdksmidi/sysex.h"
++  "include/jdksmidi/utils.h"
++  "include/jdksmidi/driver.h"
++  "include/jdksmidi/fileread.h"
++  "include/jdksmidi/filewritemultitrack.h"
++  "include/jdksmidi/midi.h"
++  "include/jdksmidi/process.h"
++  "include/jdksmidi/showcontrolhandler.h"
++  "include/jdksmidi/tempo.h"
++  "include/jdksmidi/world.h"
++  "include/jdksmidi/driverwin32.h"
++  "include/jdksmidi/filereadmultitrack.h"
++  "include/jdksmidi/keysig.h"
++  "include/jdksmidi/msg.h"
++  "include/jdksmidi/queue.h"
++  "include/jdksmidi/smpte.h"
++  "include/jdksmidi/tick.h")
++
++join("${headers}" ";" joined_headers)
++
++set_target_properties(jdksmidi
++  PROPERTIES PUBLIC_HEADER "${joined_headers}")
++
++configure_file(
++  "${CMAKE_CURRENT_SOURCE_DIR}/misc/jdksmidi.pc.in"
++  "${CMAKE_CURRENT_BINARY_DIR}/misc/jdksmidi.pc"
++  @ONLY)
++
++install(
++  TARGETS jdksmidi
++  LIBRARY       DESTINATION lib
++  ARCHIVE       DESTINATION lib
++  PUBLIC_HEADER DESTINATION include/jdksmidi)
+ 
++install(
++  FILES "${CMAKE_CURRENT_BINARY_DIR}/misc/jdksmidi.pc"
++  DESTINATION lib/pkgconfig)
+diff --git a/misc/jdksmidi.pc.in b/misc/jdksmidi.pc.in
+new file mode 100644
+index 0000000..1cd0ae0
+--- /dev/null
++++ b/misc/jdksmidi.pc.in
+@@ -0,0 +1,11 @@
++prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=${prefix}
++libdir=${prefix}/lib
++includedir=${prefix}/include
++
++Name: libjdksmidi
++Description: A C++ MIDI library by J.D. Koftinoff Software.
++Version: @JDKSMIDI_VERSION@
++
++Libs: -L${libdir} -ljdksmidi
++Cflags: -I${includedir}

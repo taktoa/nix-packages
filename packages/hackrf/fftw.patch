@@ -1,0 +1,13 @@
+diff --git a/host/hackrf-tools/src/CMakeLists.txt b/host/hackrf-tools/src/CMakeLists.txt
+index 40f11dc..d4f4d21 100644
+--- a/host/hackrf-tools/src/CMakeLists.txt
++++ b/host/hackrf-tools/src/CMakeLists.txt
+@@ -23,7 +23,7 @@
+ 
+ set(INSTALL_DEFAULT_BINDIR "bin" CACHE STRING "Appended to CMAKE_INSTALL_PREFIX")
+ 
+-find_package(FFTW REQUIRED)
++# find_package(FFTW REQUIRED)
+ 
+ SET(TOOLS
+ 	hackrf_transfer
